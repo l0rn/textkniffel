@@ -1,0 +1,4 @@
+.idea
+*.pyc
+web/js/tkclient/config.js
+wsconfig.py

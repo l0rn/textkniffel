@@ -9,6 +9,7 @@ from autobahn.twisted.websocket import WebSocketServerFactory, \
 from autobahn.twisted.resource import WebSocketResource
 
 from protocol import WebGame, ERROR_CODES
+import wsconfig
 
 
 class TodesKniffelServerProtocol(WebSocketServerProtocol):
@@ -139,7 +140,7 @@ if __name__ == "__main__":
     ##
     ## create a Twisted Web resource for our WebSocket server
     ##
-    wsFactory = WebSocketServerFactory("ws://localhost:9000",
+    wsFactory = WebSocketServerFactory("ws://{}:{}".format(wsconfig.URL, wsconfig.PORT),
                                        debug=debug,
                                        debugCodePaths=debug)
 
@@ -148,5 +149,5 @@ if __name__ == "__main__":
 
     wsResource = WebSocketResource(wsFactory)
 
-    reactor.listenTCP(9000, wsFactory)
+    reactor.listenTCP(wsconfig.PORT, wsFactory)
     reactor.run()
