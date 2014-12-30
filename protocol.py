@@ -70,7 +70,20 @@ class WebGame(Game):
                 'type': 'points',
                 'field': '{}-{}'.format(field, row),
                 'value': player.points.points[field][0]
+            }, {
+               'type': 'points',
+               'field': 'subtotal-{}'.format(row),
+               'value': player.points.subtotal()
+            }, {
+               'type': 'points',
+               'field': 'total-{}'.format(row),
+               'value': player.points.sumpoints()
+            }, {
+               'type': 'points',
+               'field': 'bonus-{}'.format(row),
+               'value': player.points.bonus()
             }
+
         except PlayerFinishedException:
             return {
                 'type': 'error',

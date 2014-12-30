@@ -67,6 +67,7 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
             case 'slot':
                 gamestate.player_token = msg['token'];
                 gamestate.game_code = msg['game_code'];
+                $('#create-game-dialog').modal('hide');
                 break;
             case 'update':
                 ui.uiupdate(msg['values']);

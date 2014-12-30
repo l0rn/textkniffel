@@ -1,5 +1,6 @@
 define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
     function initControls(conn){
+        $('#playercount-wrapper').hide();
         $('.point-row td.writable').each(function() {
             $(this).click(function() {
                 var field = this.id.split("-")[0];
@@ -11,8 +12,13 @@ define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
             conn.play('roll');
         });
         $('#ui-new').click(function() {
-            var game_code = $('#game-code').val();
-            conn.new_game(game_code, 1);
+            if ($('#playercount-wrapper').is(":hidden")) {
+                $('#playercount-wrapper').fadeIn('slow');
+            } else {
+                var game_code = $('#game-code').val();
+                var playercount = parseInt($('#playercount').val());
+                conn.new_game(game_code, playercount);
+            }
         });
         $('#ui-join').click(function() {
             var game_code = $('#game-code').val();
@@ -26,6 +32,7 @@ define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
 
             });
         });
+        $('#create-game-dialog').modal('show');
     }
 
     var initUI = function (conn){
@@ -75,7 +82,7 @@ define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
                     clearDice();
                     break;
                 case 'save':
-                    saveDice(msg['value'])
+                    saveDice(msg['value']);
             }
         }
     };

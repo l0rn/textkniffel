@@ -1,4 +1,4 @@
-define(['jquery'], function ($) {
+define(function () {
 	var dicewidth = 100;
 	var diceheight = 100;
 	var dotrad = 6;

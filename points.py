@@ -36,6 +36,9 @@ class Points():
         self.points[field] = [getattr(sys.modules[__name__], field)(values), True]
         self.points['bonus'] = self.bonus(), True
 
+    def subtotal(self):
+        return sum([self.points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six', 'bonus')])
+
     def sumpoints(self):
         return sum([i[0] for i in self.points.values()])
 
