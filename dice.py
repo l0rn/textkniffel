@@ -26,6 +26,9 @@ class Dice():
     def valuelist(self):
         return [v[0] for v in self.values.itervalues()]
 
+    def savelist(self):
+        return [v[1] for v in self.values.itervalues()]
+
     @staticmethod
     def get_dice():
         return random.randint(1, 6)

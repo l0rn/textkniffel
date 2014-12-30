@@ -5,10 +5,22 @@ from player import Player, PlayerFinishedException
 import messages
 
 
-class CommandlineGame():
+class Game():
     def __init__(self, playercount):
         self.players = Player.generate_players(self, playercount)
+        self.active_player_number = 0
 
+    def next_player(self):
+        self.active_player_number += 1
+        if self.active_player_number >= len(self.players):
+            self.active_player_number = 0
+
+    @property
+    def active_player(self):
+        return self.players[self.active_player_number]
+
+
+class CommandlineGame(Game):
     def start(self):
         finished = 0
         while finished < len(self.players):
@@ -37,10 +49,7 @@ class CommandlineGame():
         return cls(playercount)
 
 
-class CursesGame():
-    def __init__(self, playercount):
-        self.players = Player.generate_players(playercount)
-
+class CursesGame(Game):
     def start(self):
         curses_gui.game(self)
 

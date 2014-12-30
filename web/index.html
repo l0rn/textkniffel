@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head lang="de">
+    <script data-main="js/tkclient/main" src="js/lib/require.js"></script>
+
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <div id="#indicators">
+        <ul>
+            <li><span class="indicator-label">Who's turn?: </span><span id="player-indicator">[[ mock ]]</span></li>
+            <li><span class="indicator-label">Throw's left?: </span><span id="throw-indicator">[[ mock]]</span></li>
+        </ul>
+
+    </div>
+    <div id="#dice">
+        <div class="dice-container">
+            <canvas id="d1" width="100" height="100"></canvas>
+        </div>
+        <div class="dice-container">
+            <canvas id="d2" width="100" height="100"></canvas>
+        </div>
+        <div class="dice-container">
+            <canvas id="d3" width="100" height="100"></canvas>
+        </div>
+        <div class="dice-container">
+            <canvas id="d4" width="100" height="100"></canvas>
+        </div>
+        <div class="dice-container">
+            <canvas id="d5" width="100" height="100"></canvas>
+        </div>
+    </div>
+    <div id="buttonarea">
+        <button id="ui-roll">Roll!</button>
+    </div>
+    <div id="#points">
+        <div class="point-table">
+            <div class="point-row" id="p1">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="p2">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="p3">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="p4">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="p5">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="p6">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="mid-sum">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="bonus">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="triple">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="quadruple">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="fullhouse">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="smallstreet">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="bigstreet">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="kniffel">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="chance">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+            <div class="point-row" id="sum">
+                <div class="point-cell label"></div>
+                <div class="point-cell r1"></div>
+                <div class="point-cell r2"></div>
+                <div class="point-cell r3"></div>
+                <div class="point-cell r4"></div>
+            </div>
+    </div>
+</body>
+</html>

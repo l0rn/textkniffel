@@ -45,7 +45,7 @@ class Player():
     def entry_points(self, field, values):
         self.points.entry(field, values)
         if all([i[1] for i in self.points.points.values()]):
-            raise PlayerFinishedException
+            raise PlayerFinishedException()
 
     def print_points(self):
         print_points(self.points)
@@ -60,13 +60,15 @@ class Player():
                     except ValueError:
                         print_message('unknown_param', pos)
                 print_dice(self.dice)
-            elif value is 'd' and self.turn >= self.max_turns:
-                print_message('noturnsleft')
             elif value in self.commands:
-                self.commands[value]()
+                try:
+                    self.commands[value]()
+                except NoTurnsLeftException:
+                    print_message('noturnsleft')
             elif value in self.point_commands:
                 try:
                     self.entry_points(value, self.dice.valuelist())
+                    self.game.next_player()
                     raise TurnEndException()
                 except FieldAlreadyAssignedException:
                     print_message('fieldblocked')
@@ -75,10 +77,12 @@ class Player():
         except IndexError:
             print_dice(self.dice)
 
-
     def roll_dice(self):
+        if self.turn >= self.max_turns:
+            raise NoTurnsLeftException()
         self.dice.roll()
-        print_dice(self.dice)
+        # TODO: printing shouln't be done here
+        # print_dice(self.dice)
         self.turn += 1
 
     def show_points(self):
@@ -92,6 +96,11 @@ class Player():
         return [Player(game, i) for i in range(1, count+1)]
 
 
+class WebPlayer(Player):
+    def __init__(self):
+        super(WebPlayer, self).__init__(self.game)
+
+
 class TurnEndException(Exception):
     pass
 
@@ -101,4 +110,8 @@ class WrongCommandException(Exception):
 
 
 class PlayerFinishedException(Exception):
+    pass
+
+
+class NoTurnsLeftException(Exception):
     pass
