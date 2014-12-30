@@ -5,15 +5,17 @@ from player import Player, PlayerFinishedException
 import messages
 
 
-class Game():
-    def __init__(self, playercount):
-        self.players = Player.generate_players(self, playercount)
+class Game(object):
+    def __init__(self, playercount, player_cls=Player):
+        self.players = player_cls.generate_players(self, playercount)
         self.active_player_number = 0
 
     def next_player(self):
+        self.active_player.dice.clear()
         self.active_player_number += 1
         if self.active_player_number >= len(self.players):
             self.active_player_number = 0
+
 
     @property
     def active_player(self):

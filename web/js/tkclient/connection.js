@@ -1,7 +1,43 @@
-define(['tkclient/log'], function (log) {
+define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'], function (log, config, gamestate, ui) {
     var connection = {
         socket: null,
         isopen: false
+    };
+
+    connection.join = function(code) {
+        var request = {
+            type: 'join',
+            value: code
+        };
+        connection.sendText(
+            JSON.stringify(request)
+        )
+    };
+
+    connection.new_game = function(code, playercount) {
+            var request = {
+            type: 'new',
+            value: {
+                playercount: playercount,
+                game_code: code
+            }
+        };
+        connection.sendText(
+            JSON.stringify(request)
+        );
+    };
+
+    connection.play = function(command, args) {
+        var request = {
+            type: 'play',
+            value: command,
+            args: args,
+            game: gamestate.game_code,
+            auth: gamestate.player_token
+        };
+        connection.sendText(
+            JSON.stringify(request)
+        );
     };
 
     connection.sendText = function(msg) {
@@ -25,8 +61,24 @@ define(['tkclient/log'], function (log) {
         }
     };
 
+    connection.handle_message = function(msg){
+        msg = JSON.parse(msg);
+        switch (msg['type']) {
+            case 'slot':
+                gamestate.player_token = msg['token'];
+                gamestate.game_code = msg['game_code'];
+                break;
+            case 'update':
+                ui.uiupdate(msg['values']);
+                break;
+            case 'error':
+                alert(msg['error']);
+                break;
+        }
+    };
+
     var connect = function (callback) {
-        connection.socket = new WebSocket("ws://localhost:9000");
+        connection.socket = new WebSocket(config.serverUrl);
         connection.socket.binaryType = "arraybuffer";
         connection.socket.onopen = function () {
             log.write("Connected!");
@@ -36,6 +88,7 @@ define(['tkclient/log'], function (log) {
         connection.socket.onmessage = function (e) {
             if (typeof e.data == "string") {
                 log.write("Text message received: " + e.data);
+                connection.handle_message(e.data);
             } else {
                 var arr = new Uint8Array(e.data);
                 var hex = '';

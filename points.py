@@ -1,12 +1,11 @@
 #coding=utf-8
 import sys
-import ipdb
+import collections
 import messages
-from collections import OrderedDict
 
 class Points():
     def __init__(self):
-        self.points = OrderedDict([
+        self.points = collections.OrderedDict([
             ('one', [0, False]),
             ('two', [0, False]),
             ('three', [0, False]),
@@ -14,11 +13,13 @@ class Points():
             ('five', [0, False]),
             ('six', [0, False]),
             ('bonus', [0, False]),
-            ('triple', [0, False]),
-            ('quadruple', [0, False]),
+            ('onepair', [0, False]),
+            ('twopair', [0, False]),
+            ('threesome', [0, False]),
+            ('foursome', [0, False]),
             ('kniffel', [0, False]),
-            ('small_street', [0, False]),
-            ('big_street', [0, False]),
+            ('smallstreet', [0, False]),
+            ('bigstreet', [0, False]),
             ('chance', [0, False]),
             ('fullhouse', [0, False])
         ])
@@ -76,28 +77,41 @@ def six(values):
     return numbers(values, 6)
 
 
-def triple(values):
+def onepair(values):
+    if [x for x, y in collections.Counter(values).items() if y > 1] >= 1:
+        return sum(values)
+    else:
+        return 0
+
+def twopair(values):
+    if [x for x, y in collections.Counter(values).items() if y > 1] >= 2:
+        return sum(values)
+    else:
+        return 0
+
+
+def threesome(values):
     if multiple(values, 3):
         return sum(values)
     else:
         return 0
 
 
-def quadruple(values):
+def foursome(values):
     if multiple(values, 4):
         return sum(values)
     else:
         return 0
 
 
-def small_street(values):
+def smallstreet(values):
     if street(values, 4):
         return 30
     else:
         return 0
 
 
-def big_street(values):
+def bigstreet(values):
     if street(values, 4):
         return 40
     else:

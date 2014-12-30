@@ -13,13 +13,10 @@ require.config({
     }
 });
 
-// get ui api
-requirejs(['jquery', 'tkclient/draw', 'tkclient/api', 'tkclient/connection'], function ($, draw, api, connection) {
-    var handler = function(conn) {
-        conn.sendText('roll');
-        conn.sendText('roll');
-        conn.sendText('roll');
-        conn.sendText('roll');
+requirejs(['jquery', 'tkclient/draw', 'tkclient/api', 'tkclient/connection', 'tkclient/gamestate', 'tkclient/ui'], function ($, draw, api, connection, state, ui) {
+    var connectionEstablished = function(conn) {
+        ui.initUI(conn);
+
     };
-    connection.connect(handler);
+    connection.connect(connectionEstablished);
 });

@@ -1,5 +1,6 @@
 define(function(){
     return {
-        debug: true
+        debug: true,
+        serverUrl: 'ws://localhost:9000'
     }
 });

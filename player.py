@@ -4,7 +4,7 @@ from dice import Dice
 from points import Points, FieldAlreadyAssignedException
 
 
-class Player():
+class Player(object):
 
     def __init__(self, game, id=1, max_turns=3):
         self.game = game
@@ -46,6 +46,8 @@ class Player():
         self.points.entry(field, values)
         if all([i[1] for i in self.points.points.values()]):
             raise PlayerFinishedException()
+        self.game.next_player()
+        self.turn = 0
 
     def print_points(self):
         print_points(self.points)
@@ -68,7 +70,6 @@ class Player():
             elif value in self.point_commands:
                 try:
                     self.entry_points(value, self.dice.valuelist())
-                    self.game.next_player()
                     raise TurnEndException()
                 except FieldAlreadyAssignedException:
                     print_message('fieldblocked')
@@ -93,12 +94,13 @@ class Player():
 
     @classmethod
     def generate_players(cls, game, count):
-        return [Player(game, i) for i in range(1, count+1)]
+        return [cls(game, i) for i in range(1, count+1)]
 
 
 class WebPlayer(Player):
-    def __init__(self):
-        super(WebPlayer, self).__init__(self.game)
+    def __init__(self, game, id=1, max_turns=3):
+        self.token = None
+        super(WebPlayer, self).__init__(game)
 
 
 class TurnEndException(Exception):

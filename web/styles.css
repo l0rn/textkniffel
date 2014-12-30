@@ -20,7 +20,10 @@
 
 .dice-container {
   padding: 5px;
-  display: inline;
+  display: inline-block;
   border: 1px solid black; }
+
+.saved {
+  border: 1px solid red; }
 
 /*# sourceMappingURL=styles.css.map */

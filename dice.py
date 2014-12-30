@@ -6,6 +6,9 @@ class Dice():
     def __init__(self, count=5):
         self.values = {k: [0, False] for k in range(1, count+1)}
 
+    def clear(self):
+        self.__init__()
+
     def roll(self):
         for dice in self.values.itervalues():
             if not dice[1]:
