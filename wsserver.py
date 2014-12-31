@@ -56,7 +56,8 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
                     'type': 'slot',
                     'game_code': game_code,
                     'playerno': slot[0],
-                    'token': slot[1]
+                    'token': slot[1],
+                    'player_count': len(self.games[game_code].players)
                 }
             else:
                 return {
@@ -88,7 +89,8 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
                     'type': 'slot',
                     'game_code': game_code,
                     'playerno': slot[0],
-                    'token': slot[1]
+                    'token': slot[1],
+                    'player_count': len(self.games[game_code].players)
                 }
             else:
                 return {

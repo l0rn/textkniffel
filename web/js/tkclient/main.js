@@ -1,5 +1,5 @@
 require.config({
-    baseUrl: 'js'
+    baseUrl: 'js',
 });
 
 requirejs(['tkclient/draw', 'tkclient/api', 'tkclient/connection', 'tkclient/gamestate', 'tkclient/ui'], function (draw, api, connection, state, ui) {

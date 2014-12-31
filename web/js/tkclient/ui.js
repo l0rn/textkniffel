@@ -1,4 +1,4 @@
-define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
+define(['tkclient/draw', 'tkclient/gamestate'], function (draw, gamestate) {
     function initControls(conn){
         $('#playercount-wrapper').hide();
         $('.point-row td.writable').each(function() {
@@ -35,7 +35,25 @@ define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
         $('#create-game-dialog').modal('show');
     }
 
+    var initEnv = function (){
+        var players = [];
+        for (var i = 1; i <= gamestate.player_count; i++){
+            players.push({
+                'player': 'player-' + i,
+                'player_num': i
+            })
+        }
+        var template_tabs = $.templates('#pointtable');
+        var template_nav = $.templates('#pointnav');
+        var tabs = template_tabs.render(players);
+        var nav = template_nav.render(players);
+
+        $('#point-tabs-content').html(tabs);
+        $('#point-tabs-nav').html(nav);
+    };
+
     var initUI = function (conn){
+
         initControls(conn);
     };
 
@@ -89,6 +107,7 @@ define(['jquery', 'tkclient/draw', 'tkclient/connection'], function ($, draw) {
 
     return {
         uiupdate: uiupdate,
-        initUI: initUI
+        initUI: initUI,
+        initEnv: initEnv
     }
 });
