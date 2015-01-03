@@ -27,3 +27,13 @@ Webserver
 ----------
 
 You can play todeskniffel in a web application using websockets. Just type "python todeskniffel.py --server" and deploy the web application located in "webclient/" somewhere. Copy the configuration files "wsconfig.py.dist" to "wsconfig.py" and "webclient/js/tkclient/config.js.dist" to "webclient/js/tkclient/config.js". Adjust parameters.
+
+Next Steps
+------------
+
+- Refactoring of protocol
+- Feature: Rejoining after killing browser
+- Feature: Playing with more than one column
+- Feature: Add specific game rule restrictions to columns
+- Feature: Better optics for Webinterface
+- Fix: Delete Games after completion or timout
