@@ -49,8 +49,8 @@ class CommandlinePlayer(Player):
         }
 
         self.point_commands = [
-            'one', 'two', 'three', 'four', 'five', 'six', 'triple', 'quadruple', 'onepair', 'twopair',
-            'small_street', 'big_street', 'kniffel', 'fullhouse', 'chance'
+            'one', 'two', 'three', 'four', 'five', 'six', 'threesome', 'foursome', 'onepair', 'twopair',
+            'smallstreet', 'bigstreet', 'kniffel', 'fullhouse', 'chance'
         ]
 
     def play(self):
