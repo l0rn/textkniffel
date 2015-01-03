@@ -1,7 +1,8 @@
-#coding=utf-8
+# coding=utf-8
 import sys
 import collections
 import messages
+
 
 class Points():
     def __init__(self):

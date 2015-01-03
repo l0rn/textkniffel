@@ -1,5 +1,4 @@
 # coding=utf-8
-import ipdb
 
 strings = {
     'welcome': u'Willkommen zu TextKniffel, das Spiel startet sofort!',
@@ -25,11 +24,13 @@ strings = {
     'five': u'Fünfen',
     'six': u'Sechsen',
     'bonus': u'Bonus',
-    'triple': u'Dreierpasch',
-    'quadruple': u'Viererpasch',
+    'onepair': u'Ein Paar',
+    'twopair': u'Zwei Paar',
+    'threesome': u'Dreierpasch',
+    'foursome': u'Viererpasch',
     'kniffel': u'Kniffel',
-    'small_street': u'Kleine Straße',
-    'big_street': u'Große Straße',
+    'smallstreet': u'Kleine Straße',
+    'bigstreet': u'Große Straße',
     'chance': u'Chance',
     'fullhouse': u'Full House',
     'sum': u'Summe',

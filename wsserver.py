@@ -6,7 +6,6 @@ from twisted.python import log
 from twisted.internet import reactor
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol
-from autobahn.twisted.resource import WebSocketResource
 
 from protocol import WebGame, ERROR_CODES
 import wsconfig
@@ -192,8 +191,7 @@ PROTOCOL_TYPE_HANDLERS = {
 }
 
 
-if __name__ == "__main__":
-
+def start_server():
     if len(sys.argv) > 1 and sys.argv[1] == 'debug':
         log.startLogging(sys.stdout)
         debug = True
@@ -203,17 +201,12 @@ if __name__ == "__main__":
     if debug:
         log.startLogging(sys.stdout)
 
-    ##
-    ## create a Twisted Web resource for our WebSocket server
-    ##
-    wsFactory = WebSocketServerFactory("ws://{}:{}".format(wsconfig.URL, wsconfig.PORT),
-                                       debug=debug,
-                                       debugCodePaths=debug)
+    ws_factory = WebSocketServerFactory("ws://{}:{}".format(wsconfig.URL, wsconfig.PORT),
+                                        debug=debug,
+                                        debugCodePaths=debug)
 
-    wsFactory.protocol = TodesKniffelServerProtocol
-    wsFactory.setProtocolOptions(allowHixie76=True)  # needed if Hixie76 is to be supported
+    ws_factory.protocol = TodesKniffelServerProtocol
+    ws_factory.setProtocolOptions(allowHixie76=True)
 
-    wsResource = WebSocketResource(wsFactory)
-
-    reactor.listenTCP(wsconfig.PORT, wsFactory)
+    reactor.listenTCP(wsconfig.PORT, ws_factory)
     reactor.run()

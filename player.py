@@ -1,4 +1,4 @@
-#coding=utf-8
+# coding=utf-8
 from messages import prompt, print_message, print_help, print_dice, print_points
 from dice import Dice
 from points import Points, FieldAlreadyAssignedException
@@ -13,6 +13,32 @@ class Player(object):
         self.points = Points()
         self.dice = Dice()
         self.max_turns = max_turns
+
+    def save_dice(self, values):
+        self.dice.save(values)
+
+    def entry_points(self, field, values):
+        self.points.entry(field, values)
+        if all([i[1] for i in self.points.points.values()]):
+            raise PlayerFinishedException()
+        self.game.next_player()
+        self.turn = 0
+
+    def roll_dice(self):
+        if self.turn >= self.max_turns:
+            raise NoTurnsLeftException()
+        self.dice.roll()
+        self.turn += 1
+
+    @classmethod
+    def generate_players(cls, game, count):
+        return [cls(game, i) for i in range(1, count+1)]
+
+
+class CommandlinePlayer(Player):
+
+    def __init__(self, game, id=1, max_turns=3):
+        super(CommandlinePlayer, self).__init__(game, id=id, max_turns=max_turns)
         self.commands = {
             'd': self.roll_dice,
             's': self.save_dice,
@@ -23,12 +49,9 @@ class Player(object):
         }
 
         self.point_commands = [
-            'one', 'two', 'three', 'four', 'five', 'six', 'triple', 'quadruple',
+            'one', 'two', 'three', 'four', 'five', 'six', 'triple', 'quadruple', 'onepair', 'twopair',
             'small_street', 'big_street', 'kniffel', 'fullhouse', 'chance'
         ]
-
-    def save_dice(self, values):
-        self.dice.save(values)
 
     def play(self):
         self.dice = Dice()
@@ -42,12 +65,12 @@ class Player(object):
 
         self.turn = 0
 
-    def entry_points(self, field, values):
-        self.points.entry(field, values)
-        if all([i[1] for i in self.points.points.values()]):
-            raise PlayerFinishedException()
-        self.game.next_player()
-        self.turn = 0
+    def roll_dice(self):
+        super(CommandlinePlayer, self).roll_dice()
+        print_dice(self.dice)
+
+    def show_points(self):
+        print_points(self)
 
     def print_points(self):
         print_points(self.points)
@@ -78,31 +101,18 @@ class Player(object):
         except IndexError:
             print_dice(self.dice)
 
-    def roll_dice(self):
-        if self.turn >= self.max_turns:
-            raise NoTurnsLeftException()
-        self.dice.roll()
-        # TODO: printing shouln't be done here
-        # print_dice(self.dice)
-        self.turn += 1
-
-    def show_points(self):
-        print_points(self)
-
     def show_all_points(self):
         print_points(self.game.players)
 
-    @classmethod
-    def generate_players(cls, game, count):
-        return [cls(game, i) for i in range(1, count+1)]
-
 
 class WebPlayer(Player):
+
     def __init__(self, game, id=1, max_turns=3):
+        super(WebPlayer, self).__init__(game, id=id, max_turns=max_turns)
         self.token = None
         self.socket = None
         self.nickname = ''
-        super(WebPlayer, self).__init__(game)
+
 
 class TurnEndException(Exception):
     pass

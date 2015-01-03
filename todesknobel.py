@@ -1,8 +1,9 @@
-#coding=utf-8
-from game import CommandlineGame, CursesGame
+# coding=utf-8
+from game import CommandlineGame
 import argparse
 import messages
-import curses_gui
+import wsserver
+
 
 def commandline_game():
     messages.print_message('welcome')
@@ -10,18 +11,16 @@ def commandline_game():
     game.start()
 
 
-def curses_game():
-    curses_gui.welcome_screen()
-    game = CursesGame.new_game_by_curses()
-    game.start()
+def todesknobel_server():
+    wsserver.start_server()
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--curses", help="start with curses gui", action='store_true')
     parser.add_argument("--cmd", help="start with commandline gui(default)", action='store_true')
+    parser.add_argument("--server", help="start todesknobel server", action='store_true')
     args = parser.parse_args()
     if args.cmd:
         commandline_game()
-    elif args.curses:
-        curses_game()
+    elif args.server:
+        todesknobel_server()

@@ -1,7 +1,5 @@
 # coding=utf-8
-import messages
-import curses_gui
-from player import Player, PlayerFinishedException
+from player import Player, PlayerFinishedException, CommandlinePlayer
 import messages
 
 
@@ -47,7 +45,7 @@ class CommandlineGame(Game):
     def new_game_by_prompt(cls):
         messages.print_message('newgame')
         playercount = messages.prompt('chooseplayer', needed=int)
-        return cls(playercount)
+        return cls(playercount, player_cls=CommandlinePlayer)
 
 
 class CursesGame(Game):

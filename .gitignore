@@ -2,3 +2,4 @@
 *.pyc
 web/js/tkclient/config.js
 wsconfig.py
+__pycache__
