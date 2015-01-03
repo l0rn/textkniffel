@@ -21,19 +21,7 @@ p - show points of current player
 p_all - show points of all players  
 point commands - see below, assign current values to point fields:
 
-one
-two
-three
-four
-five
-six
-threesome
-foursome
-fullhouse
-kniffel
-small_street
-big_street
-chance
+one, two, three, four, five, six, threesome, foursome, fullhouse, kniffel, small\_street, big_street, chance
 
 Webserver
 ----------
