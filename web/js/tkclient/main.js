@@ -3,11 +3,16 @@ require.config({
 });
 
 requirejs(['tkclient/draw', 'tkclient/api', 'tkclient/connection', 'tkclient/gamestate', 'tkclient/ui'], function (draw, api, connection, state, ui) {
-    var connectionEstablished = function(conn) {
-        $(document).ready(function() {
-            ui.initUI(conn);
-        });
 
+    var successCallback = function(conn) {
+        $(document).ready(function() {
+            ui.gameStartDialog(conn);
+        });
     };
-    connection.connect(connectionEstablished);
+    var failureCallback = function(conn) {
+        $(document).ready(function() {
+            ui.connectionFailureDialog(conn);
+        });
+    };
+    connection.connect(successCallback, failureCallback);
 });

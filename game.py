@@ -16,7 +16,6 @@ class Game(object):
         if self.active_player_number >= len(self.players):
             self.active_player_number = 0
 
-
     @property
     def active_player(self):
         return self.players[self.active_player_number]

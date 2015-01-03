@@ -1,66 +1,114 @@
-define(['tkclient/draw', 'tkclient/gamestate'], function (draw, gamestate) {
-    function initControls(conn){
-        $('#playercount-wrapper').hide();
+define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'], function (config, draw, gamestate, log) {
+    function loadTemplate(name) {
+        //load templates
+        return $.ajax({
+            type: 'GET',
+            url: 'templates/' + name +'.html',
+            async: false,
+            success: function (response) {
+                // success
+                $.templates(name, response);
+            }
+        });
+    }
+
+    function initControls(connection){
+        $('.dice-container').each(function() {
+            $(this).click(function() {
+                var diceno = parseInt($(this).children('canvas')[0].id.split('-')[1]);
+                connection.play('save', [diceno]);
+
+            });
+        });
         $('.point-row td.writable').each(function() {
             $(this).click(function() {
                 var field = this.id.split("-")[0];
                 var row = parseInt(this.id.split("-")[1]);
-                conn.play('points', [field, row]);
+                connection.play('points', [field, row]);
             })
         });
         $('#ui-roll').click(function() {
-            conn.play('roll');
+            connection.play('roll');
         });
+
+    }
+
+    var next_player = function(player) {
+        if (player == gamestate.my_player_num - 1){
+            $('#your-turn-dialog').modal('show');
+        }
+        var name = 'Niemand';
+        if (gamestate.players[player]['active']){
+            name = gamestate.players[player]['nickname'];
+        }
+        $('.ui-active-player').html(name);
+    };
+
+    var connectionFailureDialog = function(conn){
+        $('#connection-failure-dialog').modal('show');
+    };
+
+    var gameStartDialog = function(conn) {
+        $('#playercount-wrapper').hide();
         $('#ui-new').click(function() {
             if ($('#playercount-wrapper').is(":hidden")) {
                 $('#playercount-wrapper').fadeIn('slow');
             } else {
                 var game_code = $('#game-code').val();
                 var playercount = parseInt($('#playercount').val());
-                conn.new_game(game_code, playercount);
+                var nickname = $('#nickname').val();
+                conn.new_game(game_code, playercount, nickname);
             }
         });
         $('#ui-join').click(function() {
             var game_code = $('#game-code').val();
-            conn.join(game_code);
-        });
-
-        $('.dice-container').each(function() {
-            $(this).click(function() {
-                var diceno = parseInt($(this).children('canvas')[0].id.split('-')[1]);
-                conn.play('save', [diceno]);
-
-            });
+            var nickname = $('#nickname').val();
+            conn.join(game_code, nickname);
         });
         $('#create-game-dialog').modal('show');
-    }
+    };
 
-    var initEnv = function (){
+    var initUI = function (connection){
+
         var players = [];
-        for (var i = 1; i <= gamestate.player_count; i++){
+        for (var i = 0; i < gamestate.players.length; i++){
             players.push({
-                'player': 'player-' + i,
-                'player_num': i
+                'player': 'player-' + gamestate.players[i]['player_number'],
+                'player_num': gamestate.players[i]['player_number'],
+                'player_name': gamestate.players[i]['nickname'] ? gamestate.players[i]['nickname'] : 'free slot'
             })
         }
-        var template_tabs = $.templates('#pointtable');
-        var template_nav = $.templates('#pointnav');
-        var tabs = template_tabs.render(players);
-        var nav = template_nav.render(players);
+        $.when(
+        loadTemplate('pointtable').done(function(template) {
+            var out = $.templates.pointtable.render(players);
+            $('#point-tabs-content').html(out);
+        }),
+        loadTemplate('pointnav').done(function(template) {
+            var out = $.templates.pointnav.render(players);
+            $('#point-tabs-nav').html(out);
+        })).done(function (){
+            $('#name-player-' + gamestate.my_player_num).addClass('red');
+            $('#point-tab-player-'  + gamestate.my_player_num).tab('show');
+            $('#point-tab-player-' + gamestate.my_player_num + ' .point-cell').addClass('writable');
+            initControls(connection);
+        });
 
-        $('#point-tabs-content').html(tabs);
-        $('#point-tabs-nav').html(nav);
+
     };
 
-    var initUI = function (conn){
-
-        initControls(conn);
+    var updateNicknames = function (){
+        for(var i = 0; i < gamestate.players.length; i++){
+            if (gamestate.players[i]['active']) {
+                $('#name-player-' + gamestate.players[i]['player_number']).html(gamestate.players[i]['nickname']);
+            }
+        }
     };
 
-    var updateDice = function(list) {
+    var updateDice = function(list, turnsleft) {
         for (var i = 0; i < 5; i++) {
             draw.drawdice(list[i], $('#d-'+ (i+1)));
         }
+        $('.ui-turnsleft').html(turnsleft);
     };
 
     var saveDice = function(list) {
@@ -93,7 +141,7 @@ define(['tkclient/draw', 'tkclient/gamestate'], function (draw, gamestate) {
             }
             switch (msg['type']) {
                 case 'dice':
-                    updateDice(msg['value']);
+                    updateDice(msg['value'], msg['turnsleft']);
                     break;
                 case 'points':
                     updateField(msg['field'], msg['value']);
@@ -101,6 +149,9 @@ define(['tkclient/draw', 'tkclient/gamestate'], function (draw, gamestate) {
                     break;
                 case 'save':
                     saveDice(msg['value']);
+                    break;
+                case 'next_player':
+                    next_player(msg['value']);
             }
         }
     };
@@ -108,6 +159,8 @@ define(['tkclient/draw', 'tkclient/gamestate'], function (draw, gamestate) {
     return {
         uiupdate: uiupdate,
         initUI: initUI,
-        initEnv: initEnv
+        gameStartDialog: gameStartDialog,
+        connectionFailureDialog: connectionFailureDialog,
+        updateNicknames: updateNicknames
     }
 });

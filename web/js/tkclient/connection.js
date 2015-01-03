@@ -4,22 +4,26 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
         isopen: false
     };
 
-    connection.join = function(code) {
+    connection.join = function(game_code, nickname) {
         var request = {
             type: 'join',
-            value: code
+            value: {
+                game_code: game_code,
+                nickname: nickname
+            }
         };
         connection.sendText(
             JSON.stringify(request)
         )
     };
 
-    connection.new_game = function(code, playercount) {
+    connection.new_game = function(code, playercount, nickname) {
             var request = {
             type: 'new',
             value: {
                 playercount: playercount,
-                game_code: code
+                game_code: code,
+                nickname: nickname
             }
         };
         connection.sendText(
@@ -67,9 +71,14 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
             case 'slot':
                 gamestate.player_token = msg['token'];
                 gamestate.game_code = msg['game_code'];
-                gamestate.player_count = msg['player_count'];
-                ui.initEnv();
+                gamestate.players = msg['players'];
+                gamestate.my_player_num = msg['playerno']
+                ui.initUI(connection);
                 $('#create-game-dialog').modal('hide');
+                break;
+            case 'newplayer':
+                gamestate.players = msg['players'];
+                ui.updateNicknames();
                 break;
             case 'update':
                 ui.uiupdate(msg['values']);
@@ -80,13 +89,13 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
         }
     };
 
-    var connect = function (callback) {
+    var connect = function (success, failure) {
         connection.socket = new WebSocket(config.serverUrl);
         connection.socket.binaryType = "arraybuffer";
         connection.socket.onopen = function () {
             log.write("Connected!");
             connection.isopen = true;
-            callback(connection);
+            success(connection);
         };
         connection.socket.onmessage = function (e) {
             if (typeof e.data == "string") {
@@ -105,6 +114,7 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
             log.write("Connection closed.");
             connection.socket = null;
             connection.isopen = false;
+            failure(connection);
         };
         return connection;
     };

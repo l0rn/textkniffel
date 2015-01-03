@@ -100,8 +100,9 @@ class Player(object):
 class WebPlayer(Player):
     def __init__(self, game, id=1, max_turns=3):
         self.token = None
+        self.socket = None
+        self.nickname = ''
         super(WebPlayer, self).__init__(game)
-
 
 class TurnEndException(Exception):
     pass

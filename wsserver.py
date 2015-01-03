@@ -32,17 +32,21 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
         msg = json.loads(payload)
         msg_type = msg['type']
         ret = PROTOCOL_TYPE_HANDLERS[msg_type](self, msg)
-        self.process_return_value(ret)
-
-    def process_return_value(self, ret):
-        if type(ret) == list:
-            self.sendMessage(json.dumps(ret[0]))
-            self.process_return_value(self, ret[1])
-        elif type(ret) == dict:
-            self.sendMessage(json.dumps(ret))
+        if ret:
+            if type(ret) != tuple:
+                ret = (ret,)
+            for message in ret:
+                if message:
+                    if message.get('broadcast'):
+                        game = self.games.get(message['game_code'])
+                        game.broadcast(json.dumps(message))
+                    else:
+                        self.sendMessage(json.dumps(message))
 
     def join(self, msg):
-        game_code = msg['value']
+        game_code = msg['value']['game_code']
+        nickname = msg['value']['nickname']
+
         if not re.match(r"^[\w]{0,10}$", game_code):
             return {
                 'type': 'error',
@@ -50,14 +54,37 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
                 'error': ERROR_CODES[407]
             }
         elif self.games.get(game_code):
-            slot = self.games[game_code].get_player_slot()
-            if slot:
+            game = self.games[game_code]
+            player_num, player = self.games[game_code].get_player_slot(nickname, self)
+            if player and player_num:
                 return {
                     'type': 'slot',
                     'game_code': game_code,
-                    'playerno': slot[0],
-                    'token': slot[1],
-                    'player_count': len(self.games[game_code].players)
+                    'playerno': player_num,
+                    'token': player.token,
+                    'players': game.get_players()
+                }, {
+                    'type': 'newplayer',
+                    'broadcast': True,
+                    'game_code': game_code,
+                    'players': game.get_players()
+                }, {
+
+                }, {
+                    'type': 'update',
+                    'game_code': game_code,
+                    'broadcast': True,
+                    'values': game.get_all_points()
+                }, {
+                    'type': 'update',
+                    'game_code': game_code,
+                    'broadcast': True,
+                    'values': (game.get_active_player(),)
+                }, {
+                    'type': 'update',
+                    'game_code': game_code,
+                    'broadcast': True,
+                    'values': (game.show()[0],)
                 }
             else:
                 return {
@@ -75,6 +102,14 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
     def new_game(self, msg):
         playercount = msg['value']['playercount']
         game_code = msg['value']['game_code']
+        nickname = msg['value']['nickname']
+        if not re.match(r"^[\w]{0,10}$", game_code):
+            return {
+                'type': 'error',
+                'code': 407,
+                'error': ERROR_CODES[407]
+            }
+
         if self.games.get(game_code):
             return {
                 'type': 'error',
@@ -82,15 +117,36 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
                 'error': ERROR_CODES[405]
             }
         else:
-            self.games[game_code] = WebGame(playercount)
-            slot = self.games[game_code].get_player_slot()
-            if slot:
+            game = WebGame(playercount)
+            self.games[game_code] = game
+            player_num, player = self.games[game_code].get_player_slot(nickname, self)
+            if player and player_num:
                 return {
                     'type': 'slot',
                     'game_code': game_code,
-                    'playerno': slot[0],
-                    'token': slot[1],
-                    'player_count': len(self.games[game_code].players)
+                    'playerno': player_num,
+                    'token': player.token,
+                    'players': game.get_players()
+                }, {
+                    'type': 'newplayer',
+                    'broadcast': True,
+                    'game_code': game_code,
+                    'players': game.get_players()
+                }, {
+                    'type': 'update',
+                    'game_code': game_code,
+                    'broadcast': True,
+                    'values': game.get_all_points()
+                }, {
+                    'type': 'update',
+                    'game_code': game_code,
+                    'broadcast': True,
+                    'values': (game.get_active_player(),)
+                }, {
+                    'type': 'update',
+                    'game_code': game_code,
+                    'broadcast': True,
+                    'values': (game.show()[0],)
                 }
             else:
                 return {
@@ -104,21 +160,29 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
         token = msg['auth']
         args = msg.get('args', [])
         if game.active_player.token != token:
-            return {
+            return ({
                 'type': 'error',
                 'code': 301,
                 'error': ERROR_CODES[301]
-            }
+            },)
         else:
-            value = game.protocol_handler(msg['value'], *args)
-            if type(value) != tuple:
+            value, errors = game.protocol_handler(msg['value'], *args)
+            if value and type(value) != tuple:
                 value = (value,)
-            if value:
-                return {
-                    'type': 'update',
-                    'values': value
-                }
-        return None
+            if errors and type(errors) != tuple:
+                errors = (errors,)
+            values = {
+                'type': 'update',
+                'game_code': msg['game'],
+                'broadcast': True,
+                'values': value
+            } if value else None
+            errors = {
+                'type': 'update',
+                'game_code': msg['game'],
+                'values': errors
+            } if errors else None
+            return values, errors
 
 PROTOCOL_TYPE_HANDLERS = {
     'join': TodesKniffelServerProtocol.join,
