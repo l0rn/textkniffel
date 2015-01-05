@@ -31,9 +31,7 @@ You can play todeskniffel in a web application using websockets. Just type "pyth
 Next Steps
 ------------
 
-- Refactoring of protocol
 - Feature: Rejoining after killing browser
-- Feature: Playing with more than one column
-- Feature: Add specific game rule restrictions to columns
 - Feature: Better optics for Webinterface
+- Feature: Selecting mode on game creation
 - Fix: Delete Games after completion or timout
