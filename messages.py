@@ -35,7 +35,8 @@ strings = {
     'fullhouse': u'Full House',
     'sum': u'Summe',
     'fieldblocked': u'Dieses Feld ist schon belegt',
-    'unknown_param': u'Ungültiger Parameter {}'
+    'unknown_param': u'Ungültiger Parameter {}',
+    'specify_column': u'Es muss eine Spalte gewählt werden (z.B. \'one 1\')'
 }
 
 
@@ -62,7 +63,7 @@ def print_points(players):
         points += u'\n'
     points += u'{:<18s}'.format(strings['sum'])
     for player in players:
-        points += u'{:14d}'.format(player.points.sumpoints())
+        points += u'{:14d}'.format(player.points.total())
     print header
     print points
 

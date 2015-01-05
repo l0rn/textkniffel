@@ -34,12 +34,12 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
     }
 
     var next_player = function(player) {
-        if (player == gamestate.my_player_num - 1){
+        if (player == gamestate.my_player_num && gamestate.players.length > 1){
             $('#your-turn-dialog').modal('show');
         }
         var name = 'Niemand';
-        if (gamestate.players[player]['active']){
-            name = gamestate.players[player]['nickname'];
+        if (gamestate.players[player - 1]['active']){
+            name = gamestate.players[player - 1]['nickname'];
         }
         $('.ui-active-player').html(name);
     };
@@ -74,6 +74,7 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
         for (var i = 0; i < gamestate.players.length; i++){
             players.push({
                 'player': 'player-' + gamestate.players[i]['player_number'],
+                'pointrows': gamestate.pointrows,
                 'player_num': gamestate.players[i]['player_number'],
                 'player_name': gamestate.players[i]['nickname'] ? gamestate.players[i]['nickname'] : 'free slot'
             })
@@ -144,7 +145,9 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                     updateDice(msg['value'], msg['turnsleft']);
                     break;
                 case 'points':
-                    updateField(msg['field'], msg['value']);
+                    if (msg['assigned']){
+                        updateField(msg['field'], msg['value']);
+                    }
                     clearDice();
                     break;
                 case 'save':

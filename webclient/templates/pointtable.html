@@ -3,138 +3,119 @@
         <thead>
             <tr>
                 <td class="">Feld</td>
-                <td class="">Beliebig</td>
-                <td class="">Ein Wurf</td>
-                <td class="">...</td>
-                <td class="">...</td>
+                {{for pointrows ~player=player}}
+                    <td class="">{{:name}}</td>
+                {{/for}}
             </tr>
         </thead>
         <tbody>
             <tr class="point-row">
                 <td class="point-label">Einsen</td>
-                <td class="point-cell" id="one-1-{{:player}}"></td>
-                <td class="point-cell " id="one-2-{{:player}}"></td>
-                <td class="point-cell " id="one-3-{{:player}}"></td>
-                <td class="point-cell " id="one-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="one-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Zweien</td>
-                <td class="point-cell " id="two-1-{{:player}}"></td>
-                <td class="point-cell " id="two-2-{{:player}}"></td>
-                <td class="point-cell " id="two-3-{{:player}}"></td>
-                <td class="point-cell " id="two-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="two-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Dreien</td>
-                <td class="point-cell " id="three-1-{{:player}}"></td>
-                <td class="point-cell " id="three-2-{{:player}}"></td>
-                <td class="point-cell " id="three-3-{{:player}}"></td>
-                <td class="point-cell " id="three-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="three-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Vieren</td>
-                <td class="point-cell " id="four-1-{{:player}}"></td>
-                <td class="point-cell " id="four-2-{{:player}}"></td>
-                <td class="point-cell " id="four-3-{{:player}}"></td>
-                <td class="point-cell " id="four-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="four-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Fünfen</td>
-                <td class="point-cell " id="five-1-{{:player}}"></td>
-                <td class="point-cell " id="five-2-{{:player}}"></td>
-                <td class="point-cell " id="five-3-{{:player}}"></td>
-                <td class="point-cell " id="five-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="five-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Sechsen</td>
-                <td class="point-cell " id="six-1-{{:player}}"></td>
-                <td class="point-cell " id="six-2-{{:player}}"></td>
-                <td class="point-cell " id="six-3-{{:player}}"></td>
-                <td class="point-cell " id="six-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="six-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Bonus</td>
-                <td class="point-cell " id="bonus-1-{{:player}}"></td>
-                <td class="point-cell " id="bonus-2-{{:player}}"></td>
-                <td class="point-cell " id="bonus-3-{{:player}}"></td>
-                <td class="point-cell " id="bonus-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="" id="bonus-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Zwischensumme</td>
-                <td class="point-cell " id="subtotal-1-{{:player}}"></td>
-                <td class="point-cell " id="subtotal-2-{{:player}}"></td>
-                <td class="point-cell " id="subtotal-3-{{:player}}"></td>
-                <td class="point-cell " id="subtotal-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="" id="subtotal-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Ein Paar</td>
-                <td class="point-cell " id="onepair-1-{{:player}}"></td>
-                <td class="point-cell " id="onepair-2-{{:player}}"></td>
-                <td class="point-cell " id="onepair-3-{{:player}}"></td>
-                <td class="point-cell " id="onepair-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="onepair-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Zwei Paar</td>
-                <td class="point-cell " id="twopair-1-{{:player}}"></td>
-                <td class="point-cell " id="twopair-2-{{:player}}"></td>
-                <td class="point-cell " id="twopair-3-{{:player}}"></td>
-                <td class="point-cell " id="twopair-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="twopair-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Dreier Pasch</td>
-                <td class="point-cell " id="threesome-1-{{:player}}"></td>
-                <td class="point-cell " id="threesome-2-{{:player}}"></td>
-                <td class="point-cell " id="threesome-3-{{:player}}"></td>
-                <td class="point-cell " id="threesome-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="threesome-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Vierer Pasch</td>
-                <td class="point-cell " id="foursome-1-{{:player}}"></td>
-                <td class="point-cell " id="foursome-2-{{:player}}"></td>
-                <td class="point-cell " id="foursome-3-{{:player}}"></td>
-                <td class="point-cell " id="foursome-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="foursome-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Full House</td>
-                <td class="point-cell " id="fullhouse-1-{{:player}}"></td>
-                <td class="point-cell " id="fullhouse-2-{{:player}}"></td>
-                <td class="point-cell " id="fullhouse-3-{{:player}}"></td>
-                <td class="point-cell " id="fullhouse-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="fullhouse-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Kleine Straße</td>
-                <td class="point-cell " id="smallstreet-1-{{:player}}"></td>
-                <td class="point-cell " id="smallstreet-2-{{:player}}"></td>
-                <td class="point-cell " id="smallstreet-3-{{:player}}"></td>
-                <td class="point-cell " id="smallstreet-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="smallstreet-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Große Straße</td>
-                <td class="point-cell " id="bigstreet-1-{{:player}}"></td>
-                <td class="point-cell " id="bigstreet-2-{{:player}}"></td>
-                <td class="point-cell " id="bigstreet-3-{{:player}}"></td>
-                <td class="point-cell " id="bigstreet-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="bigstreet-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Kniffel</td>
-                <td class="point-cell " id="kniffel-1-{{:player}}"></td>
-                <td class="point-cell " id="kniffel-2-{{:player}}"></td>
-                <td class="point-cell " id="kniffel-3-{{:player}}"></td>
-                <td class="point-cell " id="kniffel-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="kniffel-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Chance</td>
-                <td class="point-cell " id="chance-1-{{:player}}"></td>
-                <td class="point-cell " id="chance-2-{{:player}}"></td>
-                <td class="point-cell " id="chance-3-{{:player}}"></td>
-                <td class="point-cell " id="chance-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="point-cell" id="chance-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
             <tr class="point-row">
                 <td class="point-label">Summe</td>
-                <td class="point-cell " id="total-1-{{:player}}"></td>
-                <td class="point-cell " id="total-2-{{:player}}"></td>
-                <td class="point-cell " id="total-3-{{:player}}"></td>
-                <td class="point-cell " id="total-4-{{:player}}"></td>
+                {{for pointrows ~player=player}}
+                    <td class="" id="total-{{:id}}-{{:~player}}"></td>
+                {{/for}}
             </tr>
         </tbody>
     </table>

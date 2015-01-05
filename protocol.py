@@ -1,25 +1,31 @@
 import uuid
 from game import Game
 from player import PlayerFinishedException, TurnEndException, NoTurnsLeftException, WebPlayer
-from points import FieldAlreadyAssignedException
+from points import FieldAlreadyAssignedException, POINTS, TurnDoesntMatchRestrictionException
 
-ERROR_CODES = {
-    404: 'Game not existent',
-    405: 'Game already exists',
-    406: 'Game is full',
-    407: 'Invalid game code',
+GAME_ERRORS = {
     301: 'It\'s not your turn',
     302: 'No casts are left for you',
     303: 'Your turn is over',
     304: 'This field is already assigned',
-    330: 'The game is finished'
+    305: 'Your turn doesn\'t match restriction',
+    330: 'The game is finished',
+    390: 'Unknown Game Error'
 }
+
+
+GAME_VERSION = '0.1'
 
 
 class WebGame(Game):
 
-    def __init__(self, playercount, player_cls=WebPlayer):
-        super(WebGame, self).__init__(playercount, player_cls=player_cls)
+    def __init__(self, playercount, game_code='', player_cls=WebPlayer, point_config='STD_CONFIG'):
+        self.MSG_SKELETON = {
+            'game': game_code,
+            'version': GAME_VERSION,
+        }
+        self.game_code = game_code
+        super(WebGame, self).__init__(playercount, player_cls=player_cls, point_config=point_config)
 
     def get_player_slot(self, nickname, socket):
         for player in self.players:
@@ -27,8 +33,8 @@ class WebGame(Game):
                 player.token = str(uuid.uuid4())
                 player.nickname = nickname
                 player.socket = socket
-                return self.players.index(player) + 1, player
-        return None, None
+                return player
+        return None
 
     def broadcast(self, msg):
         for player in self.players:
@@ -41,110 +47,121 @@ class WebGame(Game):
             players.append({
                 'active': True if player.token else False,
                 'nickname': player.nickname,
-                'player_number': self.players.index(player) + 1,
+                'player_number': player.id,
             })
         return players
 
-    def protocol_handler(self, msg, *args, **kwargs):
-        return PROTOCOL_MESSAGES[msg](self, *args, **kwargs)
+    def get_newplayer(self):
+        players = self.get_players()
+        return self.game_message(
+            type='newplayer',
+            players=players,
+            broadcast=True
+        )
 
-    def roll(self, *args, **kwargs):
+    def protocol_handler(self, msg, *args, **kwargs):
+        return GAME_MESSAGES[msg](self, *args, **kwargs)
+
+    def show_dice(self):
+        return self.game_message(
+            type='dice',
+            turnsleft=self.active_player.max_turns - self.active_player.turn,
+            value=self.active_player.dice.valuelist(),
+            broadcast=True
+        )
+
+    def roll(self):
         try:
             self.active_player.roll_dice()
-            return self.show()
+            return self.show_dice()
         except NoTurnsLeftException:
-            return None, {
-                'type': 'error',
-                'code': 302,
-                'error': ERROR_CODES[302]
-            }
+            return self.game_error(302)
 
-    def show(self, *args, **kwargs):
-        return {
-            'type': 'dice',
-            'turnsleft': self.active_player.max_turns - self.active_player.turn,
-            'value': self.active_player.dice.valuelist()
-        }, None
-
-    def save(self, n, *args, **kwargs):
+    def save(self, n):
         self.active_player.save_dice([n])
-        return {
-            'type': 'save',
-            'value': self.active_player.dice.savelist()
-        }, None
+        return self.game_message(
+            type='save',
+            value=self.active_player.dice.savelist(),
+            broadcast=True
+        )
 
-    def get_active_player(self):
-        return {
-            'type': 'next_player',
-            'value': self.active_player_number
-        }
+    def get_next_player(self):
+        return self.game_message(
+            type='next_player',
+            value=self.active_player.id,
+            broadcast=True
+        )
 
-    def points(self, field, row, *args, **kwargs):
+    def get_points(self, fields, columns, players):
+        ret = []
+        for player in players:
+            points = player.points
+            for column in columns:
+                for field in fields:
+                    ret.append(self.game_message(
+                        type='points',
+                        field='{}-{}-player-{}'.format(field, column, player.id),
+                        value=points.get_field_value(field, column)[0],
+                        assigned=points.get_field_value(field, column)[1],
+                        broadcast=True,
+                    ))
+        return ret
+
+    def points(self, field, column, *args, **kwargs):
+        ret = []
+        player = self.active_player
         try:
-            player = self.active_player
-            player_number = self.active_player_number + 1
             try:
-                player.entry_points(field, self.active_player.dice.valuelist())
+                player.entry_points(field, column, self.active_player.dice.valuelist())
             except FieldAlreadyAssignedException:
-                return None, {
-                    'type': 'error',
-                    'code': 304,
-                    'error': ERROR_CODES[304]
-                }
-            return ({
-                'type': 'points',
-                'field': '{}-{}-player-{}'.format(field, row, player_number),
-                'value': player.points.points[field][0]
-            }, {
-               'type': 'points',
-               'field': 'subtotal-{}-player-{}'.format(row, player_number),
-               'value': player.points.subtotal()
-            }, {
-               'type': 'points',
-               'field': 'total-{}-player-{}'.format(row, player_number),
-               'value': player.points.sumpoints()
-            }, {
-               'type': 'points',
-               'field': 'bonus-{}-player-{}'.format(row, player_number),
-               'value': player.points.bonus()
-            }, {
-                'type': 'next_player',
-                'value': self.active_player_number
-            }, self.show()[0]),  None
+                return self.game_error(304)
+            except TurnDoesntMatchRestrictionException:
+                return self.game_error(305)
 
         except PlayerFinishedException:
-            return {
-                'type': 'points',
-                'field': '{}-{}'.format(field, row),
-                'value': player.points.points[field][0]
-            }, {
-                'type': 'error',
-                'code': 330,
-                'error': ERROR_CODES[330]
-            }
-
+            ret.append(self.game_error(330))
         except TurnEndException:
-            return None, {
-                'type': 'error',
-                'code': 303,
-                'error': ERROR_CODES[303]
-            }
+            pass
+
+        ret += self.get_points(
+            fields=[field, 'subtotal', 'total', 'bonus'],
+            columns=[column],
+            players=[player]
+        )
+        ret.append(self.show_dice())
+        return ret
 
     def get_all_points(self):
-        ret = []
-        for player in self.players:
-            for field, value in player.points.points.iteritems():
-                if value[1]:
-                    ret.append({
-                        'type': 'points',
-                        'field': '{}-{}-player-{}'.format(field, 1, self.players.index(player) + 1),
-                        'value': value[0]
-                    })
-        return tuple(ret)
+        ret = self.get_points(
+            fields=POINTS.keys() + ['subtotal', 'bonus', 'total'],
+            columns=[column['id'] for column in self.point_config],
+            players=self.players
+        )
+        return ret
 
-PROTOCOL_MESSAGES = {
+    def status_update(self):
+        return [self.get_players(), self.get_next_player(), self.show_dice()] + self.get_all_points()
+
+    def game_message(self, **kwargs):
+        message = self.MSG_SKELETON.copy()
+        message.update(kwargs)
+        return message
+
+    def game_error(self, code, broadcast=False):
+        try:
+            return self.game_message(type='error',
+                                     error=GAME_ERRORS[code],
+                                     code=code,
+                                     broadcast=broadcast)
+        except KeyError:
+            return self.game_message(type='error',
+                                     error=GAME_ERRORS[504],
+                                     code=504,
+                                     broadcast=broadcast)
+
+GAME_MESSAGES = {
     'roll': WebGame.roll,
-    'show': WebGame.show,
+    'show': WebGame.show_dice,
     'save': WebGame.save,
     'points': WebGame.points
 }

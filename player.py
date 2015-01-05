@@ -6,20 +6,20 @@ from points import Points, FieldAlreadyAssignedException
 
 class Player(object):
 
-    def __init__(self, game, id=1, max_turns=3):
+    def __init__(self, game, point_config='STD_CONFIG', uid=1, max_turns=3):
         self.game = game
-        self.id = id
+        self.id = uid
         self.turn = 0
-        self.points = Points()
+        self.points = Points(config=point_config)
         self.dice = Dice()
         self.max_turns = max_turns
 
     def save_dice(self, values):
         self.dice.save(values)
 
-    def entry_points(self, field, values):
-        self.points.entry(field, values)
-        if all([i[1] for i in self.points.points.values()]):
+    def entry_points(self, field, column, values):
+        self.points.entry(field, column, values, self.game)
+        if all([all([i[1] for i in column.points.values()]) for column in self.points.columns]):
             raise PlayerFinishedException()
         self.game.next_player()
         self.turn = 0
@@ -31,14 +31,14 @@ class Player(object):
         self.turn += 1
 
     @classmethod
-    def generate_players(cls, game, count):
-        return [cls(game, i) for i in range(1, count+1)]
+    def generate_players(cls, game, count, point_config):
+        return [cls(game, point_config=point_config, uid=i) for i in range(1, count+1)]
 
 
 class CommandlinePlayer(Player):
 
-    def __init__(self, game, id=1, max_turns=3):
-        super(CommandlinePlayer, self).__init__(game, id=id, max_turns=max_turns)
+    def __init__(self, game, uid=1, max_turns=3, point_config='STD_CONFIG'):
+        super(CommandlinePlayer, self).__init__(game, uid=uid, point_config=point_config, max_turns=max_turns)
         self.commands = {
             'd': self.roll_dice,
             's': self.save_dice,
@@ -90,10 +90,14 @@ class CommandlinePlayer(Player):
                     self.commands[value]()
                 except NoTurnsLeftException:
                     print_message('noturnsleft')
-            elif value in self.point_commands:
+            elif value.split(' ')[0] in self.point_commands:
                 try:
-                    self.entry_points(value, self.dice.valuelist())
-                    raise TurnEndException()
+                    try:
+                        column = value.split(' ')[1]
+                        self.entry_points(value, column, self.dice.valuelist())
+                        raise TurnEndException()
+                    except IndexError:
+                        print_message('specify_column')
                 except FieldAlreadyAssignedException:
                     print_message('fieldblocked')
             else:
@@ -107,8 +111,8 @@ class CommandlinePlayer(Player):
 
 class WebPlayer(Player):
 
-    def __init__(self, game, id=1, max_turns=3):
-        super(WebPlayer, self).__init__(game, id=id, max_turns=max_turns)
+    def __init__(self, game, point_config='STD_CONFIG', uid=1, max_turns=3):
+        super(WebPlayer, self).__init__(game, point_config=point_config, uid=uid, max_turns=max_turns)
         self.token = None
         self.socket = None
         self.nickname = ''

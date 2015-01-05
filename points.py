@@ -4,9 +4,7 @@ import collections
 import messages
 
 
-class Points():
-    def __init__(self):
-        self.points = collections.OrderedDict([
+POINTS = collections.OrderedDict([
             ('one', [0, False]),
             ('two', [0, False]),
             ('three', [0, False]),
@@ -25,32 +23,72 @@ class Points():
             ('fullhouse', [0, False])
         ])
 
-    def bonus(self):
-        if sum([self.points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six')]) >= 63:
+
+class PointColumn(object):
+    def __init__(self, restriction=lambda x: True):
+        self.restriction = restriction
+        self.points = POINTS.copy()
+
+
+class Points(object):
+    def __init__(self, config='STD_CONFIG'):
+        self.columns = get_pointtable(config)
+
+    def bonus(self, column):
+        if sum([self.columns[column - 1].points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six')]) >= 63:
             return 35
         else:
             return 0
 
-    def entry(self, field, values):
-        if self.points[field][1]:
-            raise FieldAlreadyAssignedException()
-        self.points[field] = [getattr(sys.modules[__name__], field)(values), True]
-        self.points['bonus'] = self.bonus(), True
+    def entry(self, field, column, values, game):
+        if self.columns[column - 1].restriction(game):
+            if self.columns[column - 1].points[field][1]:
+                raise FieldAlreadyAssignedException()
+            self.columns[column - 1].points[field] = [getattr(sys.modules[__name__], field)(values), True]
+            self.columns[column - 1].points['bonus'] = self.bonus(column), True
+        else:
+            raise TurnDoesntMatchRestrictionException()
 
-    def subtotal(self):
-        return sum([self.points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six', 'bonus')])
+    def subtotal(self, column):
+        return sum([self.columns[column - 1].points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six', 'bonus')])
 
-    def sumpoints(self):
-        return sum([i[0] for i in self.points.values()])
+    def total(self, column):
+        return sum([i[0] for i in self.columns[column - 1].points.values()])
 
     def __str__(self):
         return self.__unicode__().encode('utf-8')
 
     def __unicode__(self):
         ret = ''
-        for k, v in self.points.iteritems():
-            ret += u'{:15s}: {:8d} {}\n'.format(messages.strings[k], v[0], (u'X' if v[1] else ' '))
+        for k, v in POINTS.iteritems():
+            for column in self.columns:
+                ret += u'{:15s}: {:8d} {}\n'.format(messages.strings[k], column.points[k][0],
+                                                    (u'X' if column.points[k][1] else ' '))
         return ret
+
+    def get_field_value(self, field, column):
+        if field == 'subtotal':
+            return self.subtotal(column), True
+        elif field == 'total':
+            return self.total(column), True
+        elif field == 'bonus':
+            return self.bonus(column), True
+        else:
+            return self.columns[column - 1].points[field]
+
+    def get_field(self, field, column):
+        try:
+            return self.columns[column - 1].points[field]
+        except KeyError:
+            raise ColumnNotExistentException()
+
+
+class ColumnNotExistentException(Exception):
+    pass
+
+
+class TurnDoesntMatchRestrictionException(Exception):
+    pass
 
 
 class FieldAlreadyAssignedException(Exception):
@@ -169,3 +207,29 @@ def street(values, length):
         return True
     else:
         return False
+
+
+def one_turn(game):
+    if game.active_player.turn > 1:
+        return False
+    else:
+        return True
+
+STD_CONFIG = {
+    'Beliebig': None,
+}
+
+TODES_CONFIG = {
+    'Beliebig': None,
+    'Ein Wurf': one_turn
+}
+
+
+def get_pointtable(config):
+    thismodule = sys.modules[__name__]
+    config = getattr(thismodule, config, STD_CONFIG)
+    pointtable = []
+    for k, v in config.iteritems():
+        pointtable.append(PointColumn(v) if v else PointColumn())
+    return pointtable
+

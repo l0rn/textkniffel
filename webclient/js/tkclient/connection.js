@@ -72,7 +72,8 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
                 gamestate.player_token = msg['token'];
                 gamestate.game_code = msg['game_code'];
                 gamestate.players = msg['players'];
-                gamestate.my_player_num = msg['playerno']
+                gamestate.my_player_num = msg['playerno'];
+                gamestate.pointrows = msg['pointrows'];
                 ui.initUI(connection);
                 $('#create-game-dialog').modal('hide');
                 break;
