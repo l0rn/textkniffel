@@ -85,6 +85,9 @@ class WebGame(Game):
             broadcast=True
         )
 
+    def nobody_left(self):
+        return all([(not player.socket.state) for player in self.players])
+
     def get_next_player(self):
         return self.game_message(
             type='next_player',

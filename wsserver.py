@@ -28,6 +28,9 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
         'version': PROTOCOL_VERSION,
     }
 
+    def __init__(self, *args, **kwargs):
+        self.player = None
+
     def onConnect(self, request):
         print("Client connecting: {}".format(request.peer))
 
@@ -39,6 +42,15 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
             self.message_broker(payload)
 
     def onClose(self, wasClean, code, reason):
+        if self.player:
+            game_code = self.player.game.game_code
+            if self.player.game.nobody_left:
+                del self.games[game_code]
+                print(u"{} deleted".format(game_code))
+            else:
+                game = self.games[game_code]
+                game.broadcast(json.dumps(self.protocol_message(type='update', values=game.get_players())))
+            print(u"{} left".format(self.player.nickname))
         print("WebSocket connection closed: {}".format(reason))
 
     def message_broker(self, payload):
@@ -66,6 +78,7 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
         elif self.games.get(game_code):
             player = self.games[game_code].get_player_slot(nickname, self)
             if player:
+                self.player = player
                 return [game.game_message(
                     type='slot',
                     game_code=game.game_code,
