@@ -155,6 +155,11 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                     break;
                 case 'next_player':
                     next_player(msg['value']);
+                    break;
+                case 'newplayer':
+                    gamestate.players = msg['players'];
+                    updateNicknames();
+                    break;
             }
         }
     };

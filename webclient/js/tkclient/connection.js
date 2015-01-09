@@ -77,10 +77,6 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
                 ui.initUI(connection);
                 $('#create-game-dialog').modal('hide');
                 break;
-            case 'newplayer':
-                gamestate.players = msg['players'];
-                ui.updateNicknames();
-                break;
             case 'update':
                 ui.uiupdate(msg['values']);
                 break;

@@ -61,10 +61,20 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
             if type(ret) != list:
                 ret = [ret]
             for message in ret:
+                import ipdb; ipdb.set_trace()
                 if message:
-                    if message.get('update') and message.get('broadcast'):
-                        game = self.games.get(message['game_code'])
-                        game.broadcast(json.dumps(message))
+                    if message.get('type') == 'update':
+                        if message.get('values'):
+                            for val in message['values']:
+                                if val.get('broadcast'):
+                                    game = self.games[val['game']]
+                                    game.broadcast(json.dumps(
+                                        self.protocol_message(type='update', values=[val])
+                                    ))
+                                else:
+                                    self.sendMessage(json.dumps(
+                                        self.protocol_message(type='update', values=[val])
+                                    ))
                     else:
                         self.sendMessage(json.dumps(message))
 

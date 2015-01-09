@@ -143,7 +143,7 @@ class WebGame(Game):
         return ret
 
     def status_update(self):
-        return [self.get_players(), self.get_next_player(), self.show_dice()] + self.get_all_points()
+        return [self.get_newplayer(), self.get_next_player(), self.show_dice()] + self.get_all_points()
 
     def game_message(self, **kwargs):
         message = self.MSG_SKELETON.copy()
