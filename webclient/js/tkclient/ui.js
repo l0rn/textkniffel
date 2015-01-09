@@ -12,7 +12,7 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
         });
     }
 
-    function initControls(connection){
+    var initControls = function(connection){
         $('.dice-container').each(function() {
             $(this).click(function() {
                 var diceno = parseInt($(this).children('canvas')[0].id.split('-')[1]);
@@ -20,18 +20,11 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
 
             });
         });
-        $('.point-row td.writable').each(function() {
-            $(this).click(function() {
-                var field = this.id.split("-")[0];
-                var row = parseInt(this.id.split("-")[1]);
-                connection.play('points', [field, row]);
-            })
-        });
         $('#ui-roll').click(function() {
             connection.play('roll');
         });
 
-    }
+    };
 
     var next_player = function(player) {
         if (player == gamestate.my_player_num && gamestate.players.length > 1){
@@ -91,7 +84,14 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
             $('#name-player-' + gamestate.my_player_num).addClass('red');
             $('#point-tab-player-'  + gamestate.my_player_num).tab('show');
             $('#point-tab-player-' + gamestate.my_player_num + ' .point-cell').addClass('writable');
-            initControls(connection);
+
+            $('.point-row td.writable').each(function() {
+                $(this).click(function() {
+                    var field = this.id.split("-")[0];
+                    var row = parseInt(this.id.split("-")[1]);
+                    connection.play('points', [field, row]);
+                })
+            });
         });
 
 
@@ -105,7 +105,12 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
         }
     };
 
-    var updateDice = function(list, turnsleft) {
+    var updateDice = function(list, turnsleft, rolled) {
+        var sum = list.reduce(function(pv, cv) { return pv + cv; }, 0);
+        if (rolled && sum > 0){
+            var audio = new Audio('res/d' + rolled + '.wav');
+            audio.play();
+        }
         for (var i = 0; i < 5; i++) {
             draw.drawdice(list[i], $('#d-'+ (i+1)));
         }
@@ -142,7 +147,7 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
             }
             switch (msg['type']) {
                 case 'dice':
-                    updateDice(msg['value'], msg['turnsleft']);
+                    updateDice(msg['value'], msg['turnsleft'], msg['rolled']);
                     break;
                 case 'points':
                     if (msg['assigned']){
@@ -160,12 +165,16 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                     gamestate.players = msg['players'];
                     updateNicknames();
                     break;
+                case 'render':
+                    initUI(gamestate.connection);
+                    break;
             }
         }
     };
 
     return {
         uiupdate: uiupdate,
+        initControls: initControls,
         initUI: initUI,
         gameStartDialog: gameStartDialog,
         connectionFailureDialog: connectionFailureDialog,

@@ -59,6 +59,12 @@ class WebGame(Game):
             broadcast=True
         )
 
+    def render(self):
+        return self.game_message(
+            type='render',
+            broadcast=True
+        )
+
     def protocol_handler(self, msg, *args, **kwargs):
         return GAME_MESSAGES[msg](self, *args, **kwargs)
 
@@ -66,6 +72,7 @@ class WebGame(Game):
         return self.game_message(
             type='dice',
             turnsleft=self.active_player.max_turns - self.active_player.turn,
+            rolled=len(self.active_player.dice.values) - sum(self.active_player.dice.savelist()),
             value=self.active_player.dice.valuelist(),
             broadcast=True
         )
@@ -86,7 +93,7 @@ class WebGame(Game):
         )
 
     def nobody_left(self):
-        return all([(not player.socket.state) for player in self.players])
+        return all([(not player.socket or not player.socket.state) for player in self.players])
 
     def get_next_player(self):
         return self.game_message(

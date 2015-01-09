@@ -75,6 +75,7 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
                 gamestate.my_player_num = msg['playerno'];
                 gamestate.pointrows = msg['pointrows'];
                 ui.initUI(connection);
+                ui.initControls(connection);
                 $('#create-game-dialog').modal('hide');
                 break;
             case 'update':
@@ -113,6 +114,7 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
             connection.isopen = false;
             failure(connection);
         };
+        gamestate.connection = connection;
         return connection;
     };
 

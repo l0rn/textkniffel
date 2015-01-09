@@ -44,12 +44,15 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
     def onClose(self, wasClean, code, reason):
         if self.player:
             game_code = self.player.game.game_code
-            if self.player.game.nobody_left:
+            if self.player.game.nobody_left():
                 del self.games[game_code]
                 print(u"{} deleted".format(game_code))
             else:
                 game = self.games[game_code]
-                game.broadcast(json.dumps(self.protocol_message(type='update', values=game.get_players())))
+                self.player.delete()
+                self.distribute_message(self.protocol_message(type='update', values=[game.get_newplayer()]))
+                self.distribute_message(self.protocol_message(type='update', values=[game.render()]))
+                self.distribute_message(self.protocol_message(type='update', values=game.status_update()))
             print(u"{} left".format(self.player.nickname))
         print("WebSocket connection closed: {}".format(reason))
 
@@ -57,11 +60,13 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
         msg = json.loads(payload)
         msg_type = msg['type']
         ret = PROTOCOL_TYPE_HANDLERS[msg_type](self, msg)
-        if ret:
-            if type(ret) != list:
-                ret = [ret]
-            for message in ret:
-                import ipdb; ipdb.set_trace()
+        self.distribute_message(ret)
+
+    def distribute_message(self, message):
+        if message:
+            if type(message) != list:
+                message = [message]
+            for message in message:
                 if message:
                     if message.get('type') == 'update':
                         if message.get('values'):

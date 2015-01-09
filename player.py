@@ -30,6 +30,11 @@ class Player(object):
         self.dice.roll()
         self.turn += 1
 
+    def delete(self):
+        if self.game.active_player == self:
+            self.game.next_player()
+        del self.game.players[self.game.players.index(self)]
+
     @classmethod
     def generate_players(cls, game, count, point_config):
         return [cls(game, point_config=point_config, uid=i) for i in range(1, count+1)]
