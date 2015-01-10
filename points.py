@@ -1,4 +1,5 @@
 # coding=utf-8
+from collections import OrderedDict
 import sys
 import collections
 import messages
@@ -16,23 +17,42 @@ POINTS = collections.OrderedDict([
             ('twopair', [0, False]),
             ('threesome', [0, False]),
             ('foursome', [0, False]),
-            ('kniffel', [0, False]),
+            ('fullhouse', [0, False]),
             ('smallstreet', [0, False]),
             ('bigstreet', [0, False]),
+            ('kniffel', [0, False]),
             ('chance', [0, False]),
-            ('fullhouse', [0, False])
         ])
 
 
 class PointColumn(object):
-    def __init__(self, restriction=lambda x: True):
+    def __init__(self, restriction=lambda x, y: True):
         self.restriction = restriction
         self.points = POINTS.copy()
+        self.lastentry = -1
+
+    def everything(self, game, field):
+        return True
+
+    def one_turn(self, game, field):
+        if game.active_player.turn > 1:
+            return False
+        else:
+            return True
+
+    def up_to_down(self, game, field):
+        return self.lastentry == list(self.points.keys()).index(field) - 1
+
+    def down_to_up(self, game, field):
+        if self.lastentry == -1:
+            return field == 'chance'
+        return self.lastentry == list(self.points.keys()).index(field) + 1
 
 
 class Points(object):
     def __init__(self, config='STD_CONFIG'):
-        self.columns = get_pointtable(config)
+        self.config = get_pointconfig(config)
+        self.columns = get_pointtable(self.config)
 
     def bonus(self, column):
         if sum([self.columns[column - 1].points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six')]) >= 63:
@@ -40,14 +60,19 @@ class Points(object):
         else:
             return 0
 
-    def entry(self, field, column, values, game):
-        if self.columns[column - 1].restriction(game):
-            if self.columns[column - 1].points[field][1]:
-                raise FieldAlreadyAssignedException()
-            self.columns[column - 1].points[field] = [getattr(sys.modules[__name__], field)(values), True]
-            self.columns[column - 1].points['bonus'] = self.bonus(column), True
+    def entry(self, field, column, values, game, preview=False):
+        if self.config.values()[column - 1](self.columns[column - 1], game, field):
+            score = getattr(sys.modules[__name__], field)(values)
         else:
-            raise TurnDoesntMatchRestrictionException()
+            score = 0
+        if self.columns[column - 1].points[field][1]:
+            raise FieldAlreadyAssignedException()
+        if preview:
+            return score
+        self.columns[column - 1].points[field] = [score, True]
+        self.columns[column - 1].points['bonus'] = self.bonus(column), True
+        self.columns[column - 1].lastentry = list(POINTS.keys()).index(field)
+        return score
 
     def subtotal(self, column):
         return sum([self.columns[column - 1].points[k][0] for k in ('one', 'two', 'three', 'four', 'five', 'six', 'bonus')])
@@ -209,25 +234,26 @@ def street(values, length):
         return False
 
 
-def one_turn(game):
-    if game.active_player.turn > 1:
-        return False
-    else:
-        return True
+STD_CONFIG = OrderedDict([
+    ('Beliebig', PointColumn.everything),
+])
 
-STD_CONFIG = {
-    'Beliebig': None,
-}
 
-TODES_CONFIG = {
-    'Beliebig': None,
-    'Ein Wurf': one_turn
-}
+TODES_CONFIG = OrderedDict([
+    ('Beliebig', PointColumn.everything),
+    ('Oben nach Unten', PointColumn.up_to_down),
+    ('Unten nach Oben', PointColumn.down_to_up),
+    ('Ein Wurf', PointColumn.one_turn)
+])
+
+
+def get_pointconfig(config_str):
+    thismodule = sys.modules[__name__]
+    config = getattr(thismodule, config_str, STD_CONFIG)
+    return config
 
 
 def get_pointtable(config):
-    thismodule = sys.modules[__name__]
-    config = getattr(thismodule, config, STD_CONFIG)
     pointtable = []
     for k, v in config.iteritems():
         pointtable.append(PointColumn(v) if v else PointColumn())

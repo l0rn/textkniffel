@@ -2,6 +2,7 @@ import uuid
 from game import Game
 from player import PlayerFinishedException, TurnEndException, NoTurnsLeftException, WebPlayer
 from points import FieldAlreadyAssignedException, POINTS, TurnDoesntMatchRestrictionException
+import points
 
 GAME_ERRORS = {
     301: 'It\'s not your turn',
@@ -69,13 +70,13 @@ class WebGame(Game):
         return GAME_MESSAGES[msg](self, *args, **kwargs)
 
     def show_dice(self):
-        return self.game_message(
+        return self.preview_points() + [self.game_message(
             type='dice',
             turnsleft=self.active_player.max_turns - self.active_player.turn,
             rolled=len(self.active_player.dice.values) - sum(self.active_player.dice.savelist()),
             value=self.active_player.dice.valuelist(),
             broadcast=True
-        )
+        )]
 
     def roll(self):
         try:
@@ -117,6 +118,29 @@ class WebGame(Game):
                     ))
         return ret
 
+    def preview_points(self):
+        ret = []
+        player = self.active_player
+        for column in player.points.columns:
+            for field in column.points:
+                if field == 'bonus':
+                    continue
+                try:
+                    columno = player.points.columns.index(column)
+                    score = player.entry_points(field, columno,
+                                                self.active_player.dice.valuelist(), preview=True)
+                    ret.append(self.game_message(
+                        type='points',
+                        field='{}-{}-player-{}'.format(field, columno, player.id),
+                        value=score,
+                        assigned=False,
+                        broadcast=True,
+                        preview=True
+                    ))
+                except FieldAlreadyAssignedException:
+                    continue
+        return ret
+
     def points(self, field, column, *args, **kwargs):
         ret = []
         player = self.active_player
@@ -138,7 +162,7 @@ class WebGame(Game):
             columns=[column],
             players=[player]
         )
-        ret.append(self.show_dice())
+        ret += self.show_dice()
         return ret
 
     def get_all_points(self):
@@ -150,7 +174,7 @@ class WebGame(Game):
         return ret
 
     def status_update(self):
-        return [self.get_newplayer(), self.get_next_player(), self.show_dice()] + self.get_all_points()
+        return [self.get_newplayer(), self.get_next_player()] + self.show_dice() + self.get_all_points()
 
     def game_message(self, **kwargs):
         message = self.MSG_SKELETON.copy()

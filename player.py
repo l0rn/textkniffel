@@ -17,12 +17,14 @@ class Player(object):
     def save_dice(self, values):
         self.dice.save(values)
 
-    def entry_points(self, field, column, values):
-        self.points.entry(field, column, values, self.game)
-        if all([all([i[1] for i in column.points.values()]) for column in self.points.columns]):
-            raise PlayerFinishedException()
-        self.game.next_player()
-        self.turn = 0
+    def entry_points(self, field, column, values, preview=False):
+        score = self.points.entry(field, column, values, self.game, preview=preview)
+        if not preview:
+            if all([all([i[1] for i in column.points.values()]) for column in self.points.columns]):
+                raise PlayerFinishedException()
+            self.game.next_player()
+            self.turn = 0
+        return score
 
     def roll_dice(self):
         if self.turn >= self.max_turns:

@@ -11,7 +11,7 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
             }
         });
     }
-
+    var audio = [];
     var initControls = function(connection){
         $('.dice-container').each(function() {
             $(this).click(function() {
@@ -23,6 +23,9 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
         $('#ui-roll').click(function() {
             connection.play('roll');
         });
+        for (var i = 1; i <= 5; i++){
+            audio['d' + i] = new Audio('res/d' + i + '.wav');
+        }
 
     };
 
@@ -108,8 +111,7 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
     var updateDice = function(list, turnsleft, rolled) {
         var sum = list.reduce(function(pv, cv) { return pv + cv; }, 0);
         if (rolled && sum > 0){
-            var audio = new Audio('res/d' + rolled + '.wav');
-            audio.play();
+            audio['d' + rolled].play();
         }
         for (var i = 0; i < 5; i++) {
             draw.drawdice(list[i], $('#d-'+ (i+1)));
@@ -150,10 +152,12 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                     updateDice(msg['value'], msg['turnsleft'], msg['rolled']);
                     break;
                 case 'points':
-                    if (msg['assigned']){
+                    if (msg['assigned']) {
                         updateField(msg['field'], msg['value']);
                     }
-                    clearDice();
+                    if (!msg['preview']) {
+                        clearDice();
+                    }
                     break;
                 case 'save':
                     saveDice(msg['value']);
