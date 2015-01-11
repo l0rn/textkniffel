@@ -17,12 +17,13 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
         )
     };
 
-    connection.new_game = function(code, playercount, nickname) {
+    connection.new_game = function(code, playercount, nickname, game_config) {
             var request = {
             type: 'new',
             value: {
                 playercount: playercount,
                 game_code: code,
+                game_config: game_config,
                 nickname: nickname
             }
         };

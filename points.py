@@ -34,8 +34,8 @@ class PointColumn(object):
     def everything(self, game, field):
         return True
 
-    def one_turn(self, game, field):
-        if game.active_player.turn > 1:
+    def all_dice(self, game, field):
+        if sum(game.active_player.dice.savelist()):
             return False
         else:
             return True
@@ -243,7 +243,7 @@ TODES_CONFIG = OrderedDict([
     ('Beliebig', PointColumn.everything),
     ('Oben nach Unten', PointColumn.up_to_down),
     ('Unten nach Oben', PointColumn.down_to_up),
-    ('Ein Wurf', PointColumn.one_turn)
+    ('Von Hand', PointColumn.all_dice)
 ])
 
 

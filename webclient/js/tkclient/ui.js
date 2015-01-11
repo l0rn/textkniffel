@@ -45,15 +45,16 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
     };
 
     var gameStartDialog = function(conn) {
-        $('#playercount-wrapper').hide();
+        $('#additional-wrapper').hide();
         $('#ui-new').click(function() {
-            if ($('#playercount-wrapper').is(":hidden")) {
-                $('#playercount-wrapper').fadeIn('slow');
+            if ($('#additional-wrapper').is(":hidden")) {
+                $('#additional-wrapper').fadeIn('slow');
             } else {
                 var game_code = $('#game-code').val();
                 var playercount = parseInt($('#playercount').val());
                 var nickname = $('#nickname').val();
-                conn.new_game(game_code, playercount, nickname);
+                var game_config = $('#game-config').val();
+                conn.new_game(game_code, playercount, nickname, game_config);
             }
         });
         $('#ui-join').click(function() {
@@ -84,8 +85,9 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
             var out = $.templates.pointnav.render(players);
             $('#point-tabs-nav').html(out);
         })).done(function (){
-            $('#name-player-' + gamestate.my_player_num).addClass('red');
-            $('#point-tab-player-'  + gamestate.my_player_num).tab('show');
+            var player_tab = $('#name-player-' + gamestate.my_player_num);
+            player_tab.addClass('red');
+            player_tab.tab('show');
             $('#point-tab-player-' + gamestate.my_player_num + ' .point-cell').addClass('writable');
 
             $('.point-row td.writable').each(function() {
@@ -154,8 +156,11 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                 case 'points':
                     if (msg['assigned']) {
                         updateField(msg['field'], msg['value']);
+                        $('.preview').remove();
                     }
-                    if (!msg['preview']) {
+                    if (msg['preview']) {
+                        $('#' + msg['field']).html('<span class="preview">' + msg['value'] + '</span>');
+                    } else {
                         clearDice();
                     }
                     break;

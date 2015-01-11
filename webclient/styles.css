@@ -31,4 +31,9 @@
   font-weight: bold;
   font-size: 16px; }
 
+.preview {
+  display: block;
+  color: #ccc;
+  text-align: right; }
+
 /*# sourceMappingURL=styles.css.map */

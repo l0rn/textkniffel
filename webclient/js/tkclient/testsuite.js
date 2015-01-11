@@ -22,8 +22,9 @@ function handle_message(msg){
             }
             switch (update_body['action']) {
                 case 'roll':
-                    update_dice(update_body['content']['value']
+                    update_dice(update_body['content']['value']);
             }
+            break;
         case 'error':
             alert(msg['error']);
             break;
@@ -40,12 +41,13 @@ function join(code) {
     )
 }
 
-function new_game(code, playercount){
+function new_game(code, playercount, game_config){
         var request = {
         type: 'new',
         value: {
             playercount: playercount,
-            game_code: code
+            game_code: code,
+            game_config: game_config
         }
     };
     connection.sendText(

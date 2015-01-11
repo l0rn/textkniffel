@@ -126,7 +126,7 @@ class WebGame(Game):
                 if field == 'bonus':
                     continue
                 try:
-                    columno = player.points.columns.index(column)
+                    columno = player.points.columns.index(column) + 1
                     score = player.entry_points(field, columno,
                                                 self.active_player.dice.valuelist(), preview=True)
                     ret.append(self.game_message(

@@ -7,7 +7,7 @@ from twisted.internet import reactor
 from autobahn.twisted.websocket import WebSocketServerFactory, \
     WebSocketServerProtocol
 
-from protocol import WebGame, GAME_ERRORS, GAME_VERSION
+from protocol import WebGame, GAME_VERSION
 import wsconfig
 
 
@@ -103,20 +103,21 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
                     pointrows=game.point_config,
                 )] + [self.protocol_message(type='update', values=game.status_update())]
             else:
-                return game.game_error(406)
+                return self.protocol_error(406)
         else:
-            return game.game_error(404)
+            return self.protocol_error(404)
 
     def new_game(self, msg):
         playercount = msg['value']['playercount']
         game_code = msg['value']['game_code']
+        game_config = msg['value']['game_config']
         if not re.match(r"^[\w]{0,10}$", game_code):
             return self.protocol_error(407)
 
         if self.games.get(game_code):
             return self.protocol_error(405)
         else:
-            game = WebGame(playercount, game_code=game_code, point_config='TODES_CONFIG')
+            game = WebGame(playercount, game_code=game_code, point_config=game_config)
             self.games[game.game_code] = game
             return self.join(msg)
 
