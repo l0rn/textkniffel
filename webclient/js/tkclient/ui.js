@@ -124,9 +124,9 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
     var saveDice = function(list) {
         for (var i = 0; i < 5; i++) {
             if (list[i]) {
-                $('#d-'+ (i+1)).parent().addClass('saved');
+                $('#save-d'+ (i+1)).show();
             } else {
-                $('#d-'+ (i+1)).parent().removeClass('saved');
+                $('#save-d'+ (i+1)).hide();
             }
         }
     };

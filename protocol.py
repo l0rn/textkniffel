@@ -1,7 +1,7 @@
 import uuid
 from game import Game
 from player import PlayerFinishedException, TurnEndException, NoTurnsLeftException, WebPlayer
-from points import FieldAlreadyAssignedException, POINTS, TurnDoesntMatchRestrictionException
+from points import FieldAlreadyAssignedException, POINTS, TurnDoesntMatchRestrictionException, FieldNotAllowedException
 import points
 
 GAME_ERRORS = {
@@ -70,10 +70,12 @@ class WebGame(Game):
         return GAME_MESSAGES[msg](self, *args, **kwargs)
 
     def show_dice(self):
+        rolled = len(self.active_player.dice.values) - sum(self.active_player.dice.savelist())
+        self.active_player.states['rolled'] = rolled
         return self.preview_points() + [self.game_message(
             type='dice',
             turnsleft=self.active_player.max_turns - self.active_player.turn,
-            rolled=len(self.active_player.dice.values) - sum(self.active_player.dice.savelist()),
+            rolled=rolled,
             value=self.active_player.dice.valuelist(),
             broadcast=True
         )]
@@ -127,8 +129,12 @@ class WebGame(Game):
                     continue
                 try:
                     columno = player.points.columns.index(column) + 1
-                    score = player.entry_points(field, columno,
-                                                self.active_player.dice.valuelist(), preview=True)
+                    try:
+                        score = player.entry_points(field, columno,
+                                                    self.active_player.dice.valuelist(),
+                                                    preview=True)
+                    except TurnDoesntMatchRestrictionException:
+                        score = 'X'
                     ret.append(self.game_message(
                         type='points',
                         field='{}-{}-player-{}'.format(field, columno, player.id),

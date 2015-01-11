@@ -1,7 +1,7 @@
 # coding=utf-8
 from messages import prompt, print_message, print_help, print_dice, print_points
 from dice import Dice
-from points import Points, FieldAlreadyAssignedException
+from points import Points, FieldAlreadyAssignedException, FieldNotAllowedException
 
 
 class Player(object):
@@ -20,10 +20,10 @@ class Player(object):
     def entry_points(self, field, column, values, preview=False):
         score = self.points.entry(field, column, values, self.game, preview=preview)
         if not preview:
-            if all([all([i[1] for i in column.points.values()]) for column in self.points.columns]):
-                raise PlayerFinishedException()
             self.game.next_player()
             self.turn = 0
+            if all([all([i[1] for i in column.points.values()]) for column in self.points.columns]):
+                raise PlayerFinishedException()
         return score
 
     def roll_dice(self):
@@ -123,6 +123,7 @@ class WebPlayer(Player):
         self.token = None
         self.socket = None
         self.nickname = ''
+        self.states = {}
 
 
 class TurnEndException(Exception):

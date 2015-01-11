@@ -35,18 +35,22 @@ class PointColumn(object):
         return True
 
     def all_dice(self, game, field):
-        if sum(game.active_player.dice.savelist()):
-            return False
+        if game.active_player.states.get('rolled', 0) != len(game.active_player.dice.valuelist()):
+            return
         else:
-            return True
+            return False
 
     def up_to_down(self, game, field):
-        return self.lastentry == list(self.points.keys()).index(field) - 1
+        if self.lastentry == list(self.points.keys()).index(field) - 1:
+            return True
+        raise TurnDoesntMatchRestrictionException()
 
     def down_to_up(self, game, field):
-        if self.lastentry == -1:
-            return field == 'chance'
-        return self.lastentry == list(self.points.keys()).index(field) + 1
+        if self.lastentry == -1 and field == 'chance':
+            return True
+        elif self.lastentry == list(self.points.keys()).index(field) + 1:
+            return True
+        raise TurnDoesntMatchRestrictionException()
 
 
 class Points(object):
@@ -72,6 +76,8 @@ class Points(object):
         self.columns[column - 1].points[field] = [score, True]
         self.columns[column - 1].points['bonus'] = self.bonus(column), True
         self.columns[column - 1].lastentry = list(POINTS.keys()).index(field)
+        if field == 'bonus':
+            self.columns[column - 1].lastentry += 1
         return score
 
     def subtotal(self, column):
@@ -120,6 +126,10 @@ class FieldAlreadyAssignedException(Exception):
     pass
 
 
+class FieldNotAllowedException(Exception):
+    pass
+
+
 def one(values):
     return numbers(values, 1)
 
@@ -145,13 +155,14 @@ def six(values):
 
 
 def onepair(values):
-    if [x for x, y in collections.Counter(values).items() if y > 1] >= 1:
+    if len([x for x, y in collections.Counter(values).items() if y > 1]) >= 1:
         return sum(values)
     else:
         return 0
 
+
 def twopair(values):
-    if [x for x, y in collections.Counter(values).items() if y > 1] >= 2:
+    if len([x for x, y in collections.Counter(values).items() if y > 1]) >= 2:
         return sum(values)
     else:
         return 0
@@ -179,7 +190,7 @@ def smallstreet(values):
 
 
 def bigstreet(values):
-    if street(values, 4):
+    if street(values, 5):
         return 40
     else:
         return 0
@@ -225,8 +236,6 @@ def street(values, length):
     for i in range(1, len(values)):
         if last == values[i]-1:
             count += 1
-        else:
-            count = 1
         last = values[i]
     if count >= length:
         return True
