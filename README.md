@@ -33,5 +33,5 @@ Next Steps
 
 - Feature: Rejoining after killing browser
 - Feature: Better optics for Webinterface
-- Feature: Selecting mode on game creation
-- Fix: Delete Games after completion or timout
+- Feature: Selecting mode on game creation - available since 0.3
+- Fix: Delete Games after completion or timout - implemented since 0.3
