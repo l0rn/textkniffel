@@ -41,7 +41,10 @@ class PointColumn(object):
             return False
 
     def up_to_down(self, game, field):
+        # skip bonus
         if self.lastentry == list(self.points.keys()).index(field) - 1:
+            return True
+        elif field == 'onepair' and self.lastentry == list(self.points.keys()).index(field) - 2:
             return True
         raise TurnDoesntMatchRestrictionException()
 
@@ -49,6 +52,8 @@ class PointColumn(object):
         if self.lastentry == -1 and field == 'chance':
             return True
         elif self.lastentry == list(self.points.keys()).index(field) + 1:
+            return True
+        elif field == 'six' and self.lastentry == list(self.points.keys()).index(field) + 2:
             return True
         raise TurnDoesntMatchRestrictionException()
 
@@ -76,8 +81,6 @@ class Points(object):
         self.columns[column - 1].points[field] = [score, True]
         self.columns[column - 1].points['bonus'] = self.bonus(column), True
         self.columns[column - 1].lastentry = list(POINTS.keys()).index(field)
-        if field == 'bonus':
-            self.columns[column - 1].lastentry += 1
         return score
 
     def subtotal(self, column):
