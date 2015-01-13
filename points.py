@@ -35,8 +35,8 @@ class PointColumn(object):
         return True
 
     def all_dice(self, game, field):
-        if game.active_player.states.get('rolled', 0) != len(game.active_player.dice.valuelist()):
-            return
+        if game.active_player.states.get('rolled', 0) == len(game.active_player.dice.valuelist()):
+            return True
         else:
             return False
 
@@ -65,12 +65,12 @@ class Points(object):
             return 0
 
     def entry(self, field, column, values, game, preview=False):
-        if self.config.values()[column - 1](self.columns[column - 1], game, field):
+        if self.columns[column - 1].points[field][1]:
+            raise FieldAlreadyAssignedException()
+        elif self.config.values()[column - 1](self.columns[column - 1], game, field):
             score = getattr(sys.modules[__name__], field)(values)
         else:
             score = 0
-        if self.columns[column - 1].points[field][1]:
-            raise FieldAlreadyAssignedException()
         if preview:
             return score
         self.columns[column - 1].points[field] = [score, True]
@@ -85,6 +85,12 @@ class Points(object):
 
     def total(self, column):
         return sum([i[0] for i in self.columns[column - 1].points.values()])
+
+    def all_total(self):
+        total = 0
+        for i, val in enumerate(self.columns):
+            total += self.total(i)
+        return total
 
     def __str__(self):
         return self.__unicode__().encode('utf-8')

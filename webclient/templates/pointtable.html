@@ -112,11 +112,17 @@
                 {{/for}}
             </tr>
             <tr class="point-row">
-                <td class="point-label">Summe</td>
-                {{for pointrows ~player=player}}
-                    <td class="" id="total-{{:id}}-{{:~player}}"></td>
+                <td class="{{if rowcount == 1}}bold{{/if}} point-label">Summe</td>
+                {{for pointrows ~player=player ~rowcount=rowcount}}
+                    <td class="{{if ~rowcount == 1}}bold{{/if}}" id="total-{{:id}}-{{:~player}}"></td>
                 {{/for}}
             </tr>
+            {{if rowcount > 1}}
+                <tr class="point-row">
+                    <td class="bold point-label">Gesamtsumme</td>
+                    <td colspan="{{:rowcount}}" class="bold" id="all-total-{{:player}}"></td>
+                </tr>
+            {{/if}}
         </tbody>
     </table>
 </div>
