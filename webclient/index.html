@@ -17,6 +17,9 @@
     <title></title>
 </head>
 <body>
+    <div id="disclaimer">
+        <p>This is only an evaluation Version. Feel free to contribute code or report issues on GitHub: <a href="https://github.com/l0rn/todesknobel">https://github.com/l0rn/todesknobel</a></p>
+    </div>
     <div id="control" class="col-md-6">
         <div id="indicators" class="row">
             <span id="player-indicator"><span class="ui-active-player"></span> spielt</span>
@@ -61,18 +64,17 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="create-game-dialog" tabindex="-1" role="dialog" aria-labelledby="create-game-dialog-label" aria-hidden="true">
+    <div class="modal fade" id="create-game-dialog" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="create-game-dialog-label" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title" id="create-game-dialog-label">Join or create Game</h4>
           </div>
           <div class="modal-body">
               <label for="nickname">Dein Name</label>
-              <input class="form-control" id="nickname" type="text" placeholder="Name">
-              <label for="game-code">Game code</label>
-              <input class="form-control" id="game-code" type="text" placeholder="Game code">
+              <input class="form-control" maxlength="32" id="nickname" type="text" placeholder="Name">
+              <label for="game-code">Game code (Buchstaben und Zahlen)</label>
+              <input class="form-control" maxlength="32" id="game-code" type="text" style="text-transform:uppercase;" placeholder="Game code">
               <div class="form-group" id="additional-wrapper">
                   <label for="playercount">Spieler_innenzahl</label>
                   <select class="form-control" id="playercount">

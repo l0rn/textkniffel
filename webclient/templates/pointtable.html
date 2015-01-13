@@ -100,7 +100,7 @@
                 {{/for}}
             </tr>
             <tr class="point-row">
-                <td class="point-label">Kniffel</td>
+                <td class="point-label">Alle Fünf</td>
                 {{for pointrows ~player=player}}
                     <td class="point-cell" id="kniffel-{{:id}}-{{:~player}}"></td>
                 {{/for}}
@@ -119,7 +119,7 @@
             </tr>
             {{if rowcount > 1}}
                 <tr class="point-row">
-                    <td class="bold point-label">Gesamtsumme</td>
+                    <td class="center bold point-label">Gesamtsumme</td>
                     <td colspan="{{:rowcount}}" class="bold" id="all-total-{{:player}}"></td>
                 </tr>
             {{/if}}
