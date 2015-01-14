@@ -1,3 +1,4 @@
+from string import uppercase
 import sys
 import re
 import json
@@ -16,6 +17,7 @@ PROTOCOL_ERRORS = {
     405: 'Game already exists',
     406: 'Game is full',
     407: 'Invalid game code',
+    408: 'Invalid nickname',
     490: 'Unknown Protocol Error'
 }
 
@@ -84,13 +86,12 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
                         self.sendMessage(json.dumps(message))
 
     def join(self, msg):
-        game_code = msg['value']['game_code']
+        game_code = msg['value']['game_code'].upper()
         nickname = msg['value']['nickname']
+        if not re.match(r"^[\w]{1,32}$", nickname, re.UNICODE):
+            return self.protocol_error(408)
         game = self.games.get(game_code)
-
-        if not re.match(r"^[\w]{0,10}$", game_code):
-            return game.game_error(407)
-        elif self.games.get(game_code):
+        if self.games.get(game_code):
             player = self.games[game_code].get_player_slot(nickname, self)
             if player:
                 self.player = player
@@ -109,9 +110,9 @@ class TodesKniffelServerProtocol(WebSocketServerProtocol):
 
     def new_game(self, msg):
         playercount = msg['value']['playercount']
-        game_code = msg['value']['game_code']
+        game_code = msg['value']['game_code'].upper()
         game_config = msg['value']['game_config']
-        if not re.match(r"^[\w]{0,10}$", game_code):
+        if not re.match(r"^[\w]{1,32}$", game_code, re.UNICODE):
             return self.protocol_error(407)
 
         if self.games.get(game_code):

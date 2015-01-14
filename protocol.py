@@ -169,7 +169,18 @@ class WebGame(Game):
             players=[player]
         )
         ret += self.show_dice()
+        ret.append(self.get_all_total())
         return ret
+
+    def get_all_total(self):
+        player = self.active_player
+        return self.game_message(
+            type='points',
+            field='all-total-player-{}'.format(player.id),
+            value=player.points.all_total(),
+            assigned=True,
+            broadcast=True,
+        )
 
     def get_all_points(self):
         ret = self.get_points(

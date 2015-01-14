@@ -35,13 +35,16 @@ class PointColumn(object):
         return True
 
     def all_dice(self, game, field):
-        if game.active_player.states.get('rolled', 0) != len(game.active_player.dice.valuelist()):
-            return
+        if game.active_player.states.get('rolled', 0) == len(game.active_player.dice.valuelist()):
+            return True
         else:
             return False
 
     def up_to_down(self, game, field):
+        # skip bonus
         if self.lastentry == list(self.points.keys()).index(field) - 1:
+            return True
+        elif field == 'onepair' and self.lastentry == list(self.points.keys()).index(field) - 2:
             return True
         raise TurnDoesntMatchRestrictionException()
 
@@ -49,6 +52,8 @@ class PointColumn(object):
         if self.lastentry == -1 and field == 'chance':
             return True
         elif self.lastentry == list(self.points.keys()).index(field) + 1:
+            return True
+        elif field == 'six' and self.lastentry == list(self.points.keys()).index(field) + 2:
             return True
         raise TurnDoesntMatchRestrictionException()
 
@@ -65,19 +70,17 @@ class Points(object):
             return 0
 
     def entry(self, field, column, values, game, preview=False):
-        if self.config.values()[column - 1](self.columns[column - 1], game, field):
+        if self.columns[column - 1].points[field][1]:
+            raise FieldAlreadyAssignedException()
+        elif self.config.values()[column - 1](self.columns[column - 1], game, field):
             score = getattr(sys.modules[__name__], field)(values)
         else:
             score = 0
-        if self.columns[column - 1].points[field][1]:
-            raise FieldAlreadyAssignedException()
         if preview:
             return score
         self.columns[column - 1].points[field] = [score, True]
         self.columns[column - 1].points['bonus'] = self.bonus(column), True
         self.columns[column - 1].lastentry = list(POINTS.keys()).index(field)
-        if field == 'bonus':
-            self.columns[column - 1].lastentry += 1
         return score
 
     def subtotal(self, column):
@@ -85,6 +88,12 @@ class Points(object):
 
     def total(self, column):
         return sum([i[0] for i in self.columns[column - 1].points.values()])
+
+    def all_total(self):
+        total = 0
+        for i, val in enumerate(self.columns):
+            total += self.total(i)
+        return total
 
     def __str__(self):
         return self.__unicode__().encode('utf-8')

@@ -35,9 +35,9 @@
           </div>
           <div class="modal-body">
               <label for="nickname">Dein Name</label>
-              <input class="form-control" id="nickname" type="text" placeholder="Name">
-              <label for="game-code">Game code</label>
-              <input class="form-control" id="game-code" type="text" placeholder="Game code">
+              <input class="form-control" maxlength="32" id="nickname" type="text" placeholder="Name">
+              <label for="game-code">Game code (Buchstaben und Zahlen)</label>
+              <input class="form-control" maxlength="32" id="game-code" type="text" style="text-transform:uppercase;" placeholder="Game code">
               <div class="form-group" id="additional-wrapper">
                   <label for="playercount">Spieler_innenzahl</label>
                   <select class="form-control" id="playercount">

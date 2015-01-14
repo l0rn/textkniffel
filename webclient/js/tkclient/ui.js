@@ -62,7 +62,8 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                 'player': 'player-' + gamestate.players[i]['player_number'],
                 'pointrows': gamestate.pointrows,
                 'player_num': gamestate.players[i]['player_number'],
-                'player_name': gamestate.players[i]['nickname'] ? gamestate.players[i]['nickname'] : 'free slot'
+                'player_name': gamestate.players[i]['nickname'] ? gamestate.players[i]['nickname'] : 'free slot',
+                'rowcount': gamestate.pointrows.length
             })
         }
         $.when(
