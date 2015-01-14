@@ -1,5 +1,5 @@
 .idea
 *.pyc
-web/js/tkclient/config.js
+webclient/js/tkclient/config.js
 wsconfig.py
 __pycache__
