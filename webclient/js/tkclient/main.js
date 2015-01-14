@@ -1,9 +1,9 @@
 require.config({
-    baseUrl: 'js',
+    baseUrl: 'js'
 });
 
-requirejs(['tkclient/draw', 'tkclient/api', 'tkclient/connection', 'tkclient/gamestate', 'tkclient/ui'], function (draw, api, connection, state, ui) {
 
+requirejs(['tkclient/connection', 'tkclient/ui', 'tkclient/config'], function (connection, ui) {
     var successCallback = function(conn) {
         $(document).ready(function() {
             ui.gameStartDialog(conn);
@@ -14,5 +14,6 @@ requirejs(['tkclient/draw', 'tkclient/api', 'tkclient/connection', 'tkclient/gam
             ui.connectionFailureDialog(conn);
         });
     };
+
     connection.connect(successCallback, failureCallback);
 });

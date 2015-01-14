@@ -1,16 +1,5 @@
-define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'], function (config, draw, gamestate, log) {
-    function loadTemplate(name) {
-        //load templates
-        return $.ajax({
-            type: 'GET',
-            url: 'templates/' + name +'.html',
-            async: false,
-            success: function (response) {
-                // success
-                $.templates(name, response);
-            }
-        });
-    }
+define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log', 'tkclient/utils'], function (config, draw, gamestate, log, utils) {
+
     var audio = [];
     var initControls = function(connection){
         $('.dice-container').each(function() {
@@ -77,11 +66,11 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
             })
         }
         $.when(
-        loadTemplate('pointtable').done(function(template) {
+        utils.loadTemplate('pointtable').done(function(template) {
             var out = $.templates.pointtable.render(players);
             $('#point-tabs-content').html(out);
         }),
-        loadTemplate('pointnav').done(function(template) {
+        utils.loadTemplate('pointnav').done(function(template) {
             var out = $.templates.pointnav.render(players);
             $('#point-tabs-nav').html(out);
         })).done(function (){

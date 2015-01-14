@@ -1,4 +1,4 @@
-define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'], function (log, config, gamestate, ui) {
+define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui', 'tkclient/utils', 'tkclient/about'], function (log, config, gamestate, ui, utils, about) {
     var connection = {
         socket: null,
         isopen: false
@@ -58,7 +58,7 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
         if (connection.isopen) {
             var buf = new ArrayBuffer(32);
             var arr = new Uint8Array(buf);
-            for (i = 0; i < arr.length; ++i) arr[i] = i;
+            for (var i = 0; i < arr.length; ++i) arr[i] = i;
             connection.socket.send(buf);
             log.write("Binary message sent.");
         } else {
@@ -70,13 +70,17 @@ define(['tkclient/log', 'tkclient/config', 'tkclient/gamestate', 'tkclient/ui'],
         msg = JSON.parse(msg);
         switch (msg['type']) {
             case 'slot':
-                gamestate.player_token = msg['token'];
-                gamestate.game_code = msg['game_code'];
-                gamestate.players = msg['players'];
-                gamestate.my_player_num = msg['playerno'];
-                gamestate.pointrows = msg['pointrows'];
-                ui.initUI(connection);
-                ui.initControls(connection);
+                utils.loadTemplate('main').done(function(template) {
+                    var out = $.templates.main.render(about.init);
+                    $('#main').html(out);
+                    gamestate.player_token = msg['token'];
+                    gamestate.game_code = msg['game_code'];
+                    gamestate.players = msg['players'];
+                    gamestate.my_player_num = msg['playerno'];
+                    gamestate.pointrows = msg['pointrows'];
+                    ui.initUI(connection);
+                    ui.initControls(connection);
+                });
                 $('#create-game-dialog').modal('hide');
                 break;
             case 'update':

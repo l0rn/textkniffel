@@ -39,4 +39,10 @@
   left: 14px;
   color: red; }
 
+#main {
+  margin: 10px auto; }
+
+#game-code {
+  text-transform: uppercase; }
+
 /*# sourceMappingURL=styles.css.map */
