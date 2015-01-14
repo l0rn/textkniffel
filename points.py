@@ -171,7 +171,7 @@ def onepair(values):
 
 
 def twopair(values):
-    if len([x for x, y in collections.Counter(values).items() if y > 1]) >= 2:
+    if len([x for x, y in collections.Counter(values).items() if y > 1]) >= 2 or multiple(values, 4):
         return sum(values)
     else:
         return 0
