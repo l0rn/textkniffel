@@ -84,6 +84,16 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
                 $(this).click(function() {
                     var field = this.id.split("-")[0];
                     var row = parseInt(this.id.split("-")[1]);
+                    var turnsleft = parseInt($('.ui-turnsleft').text());
+                    if (turnsleft >= 3 || turnsleft === ""){
+                        alert('Erst einmal würfeln');
+                        return;
+                    }
+                    if (parseInt($(this).children('.preview').text()) <= 0) {
+                        if (!confirm('Wirklich 0 für ' + field + ' eintragen?')){
+                            return;
+                        }
+                    }
                     connection.play('points', [field, row]);
                 })
             });
@@ -103,6 +113,7 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
     var updateDice = function(list, turnsleft, rolled) {
         var sum = list.reduce(function(pv, cv) { return pv + cv; }, 0);
         if (rolled && sum > 0){
+            audio['d' + rolled].load();
             audio['d' + rolled].play();
         }
         for (var i = 0; i < 5; i++) {
@@ -129,7 +140,8 @@ define(['tkclient/config', 'tkclient/draw', 'tkclient/gamestate', 'tkclient/log'
 
 
     var updateField = function(field, value){
-        $('#' + field).html(value);
+        var field_obj = $('#' + field).html(value);
+        field_obj.removeClass('writable');
     };
 
     var uiupdate = function (messages) {
