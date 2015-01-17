@@ -206,7 +206,7 @@ def bigstreet(values):
 
 
 def fullhouse(values):
-    if multiple(values, 3, exact=True) and multiple(values, 2, exact=True):
+    if (multiple(values, 3, exact=True) and multiple(values, 2, exact=True)) or kniffel(values):
         return 25
     else:
         return 0
@@ -245,11 +245,12 @@ def street(values, length):
     for i in range(1, len(values)):
         if last == values[i]-1:
             count += 1
+            if count >= length:
+                return True
+        else:
+            count = 1
         last = values[i]
-    if count >= length:
-        return True
-    else:
-        return False
+    return False
 
 
 STD_CONFIG = OrderedDict([
