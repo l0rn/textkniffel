@@ -1,7 +1,9 @@
+#!/usr/bin/python2
 # coding=utf-8
 from game import CommandlineGame
 import argparse
 import messages
+from messages import print_message
 import wsserver
 
 
@@ -17,10 +19,10 @@ def todesknobel_server():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--cmd", help="start with commandline gui(default)", action='store_true')
-    parser.add_argument("--server", help="start todesknobel server", action='store_true')
+    parser.add_argument("--cmd", help="start with commandline ***CURRENTLY NOT WORKING***)", action='store_true')
+    parser.add_argument("--server", help="start todesknobel websocket server", action='store_true')
     args = parser.parse_args()
     if args.cmd:
-        commandline_game()
+        print_message('no_cmd_game')
     elif args.server:
         todesknobel_server()

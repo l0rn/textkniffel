@@ -36,7 +36,8 @@ strings = {
     'sum': u'Summe',
     'fieldblocked': u'Dieses Feld ist schon belegt',
     'unknown_param': u'Ungültiger Parameter {}',
-    'specify_column': u'Es muss eine Spalte gewählt werden (z.B. \'one 1\')'
+    'specify_column': u'Es muss eine Spalte gewählt werden (z.B. \'one 1\')',
+    'no_cmd_game': u'Der Kommandozeilenmodus ist zur Zeit nicht funktionstüchtig'
 }
 
 
@@ -55,15 +56,15 @@ def print_points(players):
     for player in players:
         header += u'{:>14s}'.format(strings['player'].format(player.id))
     points = u''
-    for field in player.points.points:
+    for field in player.points.columns[0].points:
         points += u'{:<18s}'.format(strings[field])
         for player in players:
-            points += u'   {}{:>10d}'.format('X' if player.points.points[field][1] else ' ',
-                                             player.points.points[field][0])
+            points += u'   {}{:>10d}'.format('X' if player.points.columns[0].points[field][1] else ' ',
+                                             player.points.columns[0].points[field][0])
         points += u'\n'
     points += u'{:<18s}'.format(strings['sum'])
     for player in players:
-        points += u'{:14d}'.format(player.points.total())
+        points += u'{:14d}'.format(player.points.total(0))
     print header
     print points
 
