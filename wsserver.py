@@ -168,12 +168,8 @@ def start_server():
     if debug:
         log.startLogging(sys.stdout)
 
-    ws_factory = WebSocketServerFactory("ws://{}:{}".format(wsconfig.URL, wsconfig.PORT),
-                                        debug=debug,
-                                        debugCodePaths=debug)
-
+    ws_factory = WebSocketServerFactory("ws://{}:{}".format(wsconfig.URL, wsconfig.PORT))
     ws_factory.protocol = TodesKniffelServerProtocol
-    ws_factory.setProtocolOptions(allowHixie76=True)
 
     reactor.listenTCP(wsconfig.PORT, ws_factory)
     reactor.run()
